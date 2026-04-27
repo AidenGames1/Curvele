@@ -1,0 +1,1557 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Curvele</title>
+  <style>
+    :root {
+      --bg: #0e1423;
+      --bg-glow: #18294a;
+      --panel: rgba(18, 26, 44, 0.92);
+      --panel-2: rgba(24, 36, 59, 0.94);
+      --panel-3: rgba(33, 47, 77, 0.9);
+      --tile: rgba(14, 20, 35, 0.92);
+      --tile-border: rgba(126, 145, 185, 0.28);
+      --ink: #f6f8ff;
+      --muted: #b8c5e0;
+      --grid: rgba(255, 255, 255, 0.12);
+      --white-line: #ffffff;
+      --red: #ff8d98;
+      --blue: #89cbff;
+      --yellow: #ffe18a;
+      --green: #92f2bc;
+      --purple: #d7b3ff;
+      --orange: #ffc18c;
+      --red-tile: #ffd6db;
+      --blue-tile: #d8efff;
+      --yellow-tile: #fff0bf;
+      --green-tile: #dcfee9;
+      --purple-tile: #efdeff;
+      --orange-tile: #ffe3c8;
+      --shadow: rgba(0, 0, 0, 0.34);
+      --point-stroke: #101623;
+    }
+
+    body.light-mode {
+      --bg: #dce7f8;
+      --bg-glow: #bfd3f5;
+      --panel: rgba(239, 245, 253, 0.94);
+      --panel-2: rgba(228, 237, 249, 0.96);
+      --panel-3: rgba(214, 227, 246, 0.98);
+      --tile: rgba(248, 251, 255, 0.98);
+      --tile-border: rgba(92, 117, 161, 0.28);
+      --ink: #182541;
+      --muted: #4f6286;
+      --grid: rgba(33, 53, 89, 0.22);
+      --white-line: #ffffff;
+      --shadow: rgba(67, 91, 136, 0.16);
+      --point-stroke: #283853;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(117, 162, 255, 0.24), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(182, 111, 255, 0.18), transparent 28%),
+        linear-gradient(180deg, color-mix(in srgb, var(--bg) 84%, #11192c) 0%, var(--bg) 42%, color-mix(in srgb, var(--bg) 74%, #0a101d) 100%);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .game {
+      width: min(860px, 100%);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 0 18px;
+      border-bottom: 1px solid rgba(141, 160, 198, 0.16);
+    }
+
+    .title-wrap {
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: block;
+      font-size: 0.75rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: #8ec7ff;
+      margin-bottom: 4px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 2.9rem);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .icon-btn,
+    .action-btn {
+      border: 1px solid rgba(134, 156, 197, 0.24);
+      background: linear-gradient(180deg, var(--panel-3), var(--panel));
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 11px 15px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      transition: transform 120ms ease, filter 120ms ease;
+    }
+
+    .icon-btn:hover,
+    .action-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+    }
+
+    .play-area {
+      display: grid;
+      justify-items: center;
+      gap: 16px;
+      padding: 24px 0 30px;
+    }
+
+    .graph-card,
+    .panel-card {
+      width: 100%;
+      max-width: 780px;
+      background: linear-gradient(180deg, var(--panel-2), var(--panel));
+      border: 1px solid rgba(143, 162, 198, 0.16);
+      border-radius: 24px;
+      box-shadow: 0 22px 42px var(--shadow);
+    }
+
+    .graph-card {
+      padding: 20px 20px 16px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .graph-card::before,
+    .panel-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), transparent 30%);
+      border-radius: inherit;
+    }
+
+    .axis-label {
+      position: absolute;
+      left: 18px;
+      font-size: 0.86rem;
+      color: var(--muted);
+      font-weight: 700;
+      z-index: 1;
+    }
+
+    .axis-top {
+      top: 20px;
+    }
+
+    .axis-bottom {
+      bottom: 52px;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .board-shell {
+      width: 100%;
+      max-width: 780px;
+      position: relative;
+      padding: 16px;
+    }
+
+    .board-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .board-title {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .board-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .hidden-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      width: 1px;
+      height: 1px;
+    }
+
+    .hint-row {
+      color: var(--muted);
+      font-size: 0.96rem;
+      text-align: center;
+      min-height: 22px;
+      margin-top: 10px;
+    }
+
+    .selector-chip {
+      border-radius: 16px;
+      padding: 10px 8px;
+      text-align: center;
+      font-size: 0.84rem;
+      font-weight: 800;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .board {
+      width: 100%;
+      max-width: 680px;
+      display: grid;
+      gap: 10px;
+      margin-top: 2px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .guess-line {
+      display: grid;
+      grid-template-columns: 124px minmax(320px, 1fr);
+      gap: 10px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .selector-chip {
+      background: var(--panel);
+      color: var(--muted);
+      cursor: pointer;
+      min-height: 72px;
+      white-space: nowrap;
+      width: 124px;
+    }
+
+    .selector-chip strong,
+    .selector-chip span {
+      display: block;
+    }
+
+    .selector-chip strong {
+      font-size: 0.82rem;
+      margin-bottom: 4px;
+    }
+
+    .selector-chip span {
+      font-size: 0.72rem;
+      opacity: 0.86;
+      font-weight: 700;
+    }
+
+    .selector-chip.active {
+      color: #102038;
+      border-color: transparent;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+    }
+
+    .selector-chip.inactive {
+      opacity: 0.62;
+    }
+
+    .selector-chip.pending {
+      opacity: 0.88;
+      cursor: pointer;
+    }
+
+    .guess-row {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(56px, 1fr));
+      gap: 10px;
+      min-width: 320px;
+    }
+
+    .guess-tile {
+      aspect-ratio: 1 / 1;
+      border: 2px solid var(--tile-border);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), transparent 28%),
+        var(--tile);
+      display: grid;
+      place-items: center;
+      text-transform: uppercase;
+      font-size: 1.75rem;
+      font-weight: 900;
+      user-select: none;
+      border-radius: 18px;
+      box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .guess-tile.filled {
+      border-color: rgba(161, 180, 220, 0.44);
+      transform: translateY(-1px);
+    }
+
+    .guess-tile.guess-0,
+    .selector-chip.guess-0,
+    .selector-chip.guess-0.active,
+    .selector-chip.guess-0.pending {
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--blue);
+      border-color: rgba(137, 203, 255, 0.62);
+      color: #17364d;
+    }
+
+    .guess-tile.guess-1,
+    .selector-chip.guess-1,
+    .selector-chip.guess-1.active,
+    .selector-chip.guess-1.pending {
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--red);
+      border-color: rgba(255, 141, 152, 0.62);
+      color: #521720;
+    }
+
+    .guess-tile.guess-2,
+    .selector-chip.guess-2,
+    .selector-chip.guess-2.active,
+    .selector-chip.guess-2.pending {
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--yellow);
+      border-color: rgba(255, 225, 138, 0.64);
+      color: #5a4711;
+    }
+
+    .guess-tile.guess-3,
+    .selector-chip.guess-3,
+    .selector-chip.guess-3.active,
+    .selector-chip.guess-3.pending {
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--green);
+      border-color: rgba(146, 242, 188, 0.64);
+      color: #184a2e;
+    }
+
+    .guess-tile.guess-4,
+    .selector-chip.guess-4,
+    .selector-chip.guess-4.active,
+    .selector-chip.guess-4.pending {
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--purple);
+      border-color: rgba(215, 179, 255, 0.64);
+      color: #432560;
+    }
+
+    .guess-tile.guess-5,
+    .selector-chip.guess-5,
+    .selector-chip.guess-5.active,
+    .selector-chip.guess-5.pending {
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--orange);
+      border-color: rgba(255, 193, 140, 0.64);
+      color: #653819;
+    }
+
+    .guess-tile.exact {
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), #6aaa64;
+      border-color: #6aaa64;
+      color: #102414;
+    }
+
+    #resultWord,
+    #resultLastGuess {
+      white-space: nowrap;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+
+    .status {
+      width: 100%;
+      max-width: 780px;
+      min-height: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.99rem;
+    }
+
+    .status-fixed {
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .toast-layer {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 30;
+      pointer-events: none;
+    }
+
+    .toast {
+      min-width: 220px;
+      max-width: min(90vw, 420px);
+      padding: 12px 16px;
+      border-radius: 14px;
+      background: rgba(8, 11, 20, 0.92);
+      color: #f6f8ff;
+      text-align: center;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
+      animation: toastInOut 2200ms ease forwards;
+    }
+
+    body.light-mode .toast {
+      background: rgba(24, 36, 59, 0.92);
+      color: #f6f8ff;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 9, 18, 0.84);
+      backdrop-filter: blur(8px);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      z-index: 10;
+    }
+
+    .settings-row {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel) 88%, transparent);
+      border: 1px solid rgba(143, 162, 198, 0.12);
+    }
+
+    .setting-item strong,
+    .setting-item span {
+      display: block;
+    }
+
+    .setting-item span {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-top: 4px;
+    }
+
+    .signature-wrap {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(143, 162, 198, 0.16);
+    }
+
+    .signature-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .signature-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .signature-input {
+      width: 100%;
+      height: 48px;
+      border-radius: 14px;
+      border: 1px solid rgba(143, 162, 198, 0.2);
+      background: color-mix(in srgb, var(--panel) 82%, #fff 18%);
+      color: var(--ink);
+      padding: 0 14px;
+      font-size: 1rem;
+    }
+
+    .signature-preview {
+      margin-top: 12px;
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel) 82%, #0b1020 18%);
+      border: 1px solid rgba(143, 162, 198, 0.14);
+      padding: 10px 12px;
+    }
+
+    .signature-note {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .toggle {
+      appearance: none;
+      width: 54px;
+      height: 32px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.16);
+      border: 1px solid rgba(143,162,198,0.22);
+      position: relative;
+      cursor: pointer;
+      transition: background 140ms ease;
+    }
+
+    .toggle::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 140ms ease;
+    }
+
+    .toggle:checked {
+      background: rgba(117, 162, 255, 0.55);
+    }
+
+    .toggle:checked::after {
+      transform: translateX(22px);
+    }
+
+    .overlay[hidden] {
+      display: none;
+    }
+
+    .modal {
+      width: min(760px, 100%);
+      max-height: min(90vh, 920px);
+      overflow: auto;
+      background:
+        radial-gradient(circle at top, rgba(103, 149, 255, 0.12), transparent 30%),
+        linear-gradient(180deg, var(--panel-2), var(--panel));
+      border: 1px solid rgba(143, 162, 198, 0.18);
+      border-radius: 26px;
+      padding: 26px;
+      box-shadow: 0 28px 60px rgba(0,0,0,0.42);
+    }
+
+    .modal h2,
+    .modal h3 {
+      margin: 0 0 12px;
+    }
+
+    .modal p,
+    .modal li {
+      color: var(--muted);
+      line-height: 1.62;
+    }
+
+    .modal ul {
+      padding-left: 20px;
+      margin: 10px 0 18px;
+    }
+
+    .example-block {
+      border: 1px solid rgba(143, 162, 198, 0.14);
+      border-radius: 20px;
+      padding: 16px;
+      margin: 14px 0;
+      background: color-mix(in srgb, var(--panel) 76%, transparent);
+    }
+
+    .example-block h3 {
+      font-size: 1.05rem;
+    }
+
+    .example-graph {
+      margin-top: 12px;
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel) 88%, #0b1020 12%);
+      border: 1px solid rgba(143, 162, 198, 0.14);
+      padding: 12px;
+    }
+
+    .example-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      max-width: 290px;
+      margin: 14px 0 10px;
+    }
+
+    .example-tile {
+      aspect-ratio: 1 / 1;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(143, 162, 198, 0.2);
+      border-radius: 14px;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--ink);
+      background: color-mix(in srgb, var(--panel) 88%, transparent);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .detail-card {
+      border-radius: 16px;
+      padding: 14px;
+      background: color-mix(in srgb, var(--panel) 88%, transparent);
+      border: 1px solid rgba(143, 162, 198, 0.12);
+      color: var(--muted);
+    }
+
+    .detail-card strong {
+      display: block;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .result-graph {
+      margin-top: 14px;
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel) 88%, #0b1020 12%);
+      border: 1px solid rgba(143, 162, 198, 0.14);
+      padding: 12px;
+    }
+
+    .result-caption {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .start-overlay {
+      background:
+        radial-gradient(circle at top, rgba(117, 162, 255, 0.18), transparent 34%),
+        rgba(4, 8, 18, 0.88);
+    }
+
+    .start-modal {
+      text-align: center;
+      max-width: 560px;
+    }
+
+    .start-title {
+      margin: 0;
+      font-size: clamp(2.6rem, 6vw, 4.2rem);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .start-byline {
+      margin: 10px 0 0;
+      color: #8ec7ff;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .start-copy {
+      margin: 18px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .start-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .result-overlay .modal {
+      animation: resultIn 360ms cubic-bezier(.2,.8,.2,1);
+    }
+
+    @keyframes resultIn {
+      0% {
+        opacity: 0;
+        transform: translateY(-28px) scale(0.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes drawLine {
+      0% {
+        opacity: 0;
+        stroke-dashoffset: var(--path-length);
+      }
+      100% {
+        opacity: 1;
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes toastInOut {
+      0% {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      12% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      82% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .graph-card {
+        padding-left: 46px;
+      }
+
+      .guess-line {
+        grid-template-columns: 98px minmax(320px, 1fr);
+      }
+
+      .selector-chip {
+        width: 98px;
+      }
+
+      .guess-tile {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="toastLayer" class="toast-layer" aria-live="polite"></div>
+  <div class="shell">
+    <main class="game">
+      <header class="topbar">
+        <button id="helpButton" class="icon-btn" type="button">Rules</button>
+        <div class="title-wrap">
+          <span class="eyebrow">Graph Guessing Game</span>
+          <h1 class="title">Curvele</h1>
+        </div>
+        <div class="top-actions">
+          <button id="settingsButton" class="icon-btn" type="button">Settings</button>
+          <button id="newGame" class="icon-btn" type="button">New Word</button>
+        </div>
+      </header>
+
+      <section class="play-area">
+        <div class="graph-card">
+          <span class="axis-label axis-top">Z</span>
+          <span class="axis-label axis-bottom">A</span>
+          <svg id="graph" viewBox="0 0 720 380" aria-label="Curvele graph"></svg>
+        </div>
+
+        <div class="board-shell panel-card" id="boardShell" tabindex="0">
+          <div class="board-header">
+            <h2 class="board-title">Words Guessed</h2>
+            <p class="board-copy">Tap the active row to type. Press Enter to submit your word.</p>
+          </div>
+          <input id="wordInput" class="hidden-input" type="text" maxlength="5" autocomplete="off" spellcheck="false">
+          <div class="hint-row" id="hintRow">Tap the current row to type a real five-letter word, then compare your colored line to the white answer line.</div>
+          <div class="board" id="board" aria-live="polite"></div>
+        </div>
+
+        <p class="status status-fixed" id="status">You have six tries to guess the five-letter word using the charts.</p>
+      </section>
+    </main>
+  </div>
+
+  <div id="startOverlay" class="overlay start-overlay">
+    <div class="modal start-modal">
+      <h2 class="start-title">Curvele</h2>
+      <p class="start-byline">By Aiden Heller</p>
+      <p class="start-copy">
+        Guess the hidden five-letter word by reading the graph shape. Compare your colored guess lines
+        against the white answer curve and solve it in six tries.
+      </p>
+      <div class="start-actions">
+        <button id="startPlay" class="action-btn" type="button">Play</button>
+        <button id="startTutorial" class="action-btn" type="button">Tutorial</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="rulesOverlay" class="overlay" hidden>
+    <div class="modal">
+      <h2>How To Play</h2>
+      <p>You have six tries to guess the hidden five-letter word by reading the shape of the graph.</p>
+      <ul>
+        <li>The white line is the answer curve you are trying to decode.</li>
+        <li>Each of the five points matches one letter position from left to right.</li>
+        <li>Low on the graph means the letter is closer to A. High on the graph means the letter is closer to Z.</li>
+        <li>When you guess a word, the guess appears below the graph and its line is added on top of the chart for comparison.</li>
+        <li>Only exact position matches turn green in the guess row and on the answer graph. There is no yellow hint in this game.</li>
+      </ul>
+
+      <div class="example-block">
+        <h3>Read The White Curve First</h3>
+        <p>This example answer is <strong style="color: var(--ink);">READY</strong>. Each point is labeled so you can see which letter belongs to each answer point.</p>
+        <div class="example-graph">
+          <svg viewBox="0 0 620 220" aria-label="Example answer graph">
+            <line x1="36" y1="24" x2="36" y2="196" stroke="rgba(255,255,255,0.18)" />
+            <line x1="36" y1="24" x2="596" y2="24" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
+            <line x1="36" y1="110" x2="596" y2="110" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
+            <line x1="36" y1="196" x2="596" y2="196" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
+            <text x="10" y="30" fill="#c7c7cb" font-size="14" font-weight="700">Z</text>
+            <text x="12" y="196" fill="#c7c7cb" font-size="14" font-weight="700">A</text>
+            <path d="M 60 82 C 130 82, 130 168, 200 168 C 270 168, 270 196, 340 196 C 410 196, 410 175, 480 175 C 545 175, 545 30, 580 30" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="60" cy="82" r="6" fill="#ffffff" stroke="#1f2d47" stroke-width="2.5" />
+            <circle cx="200" cy="168" r="6" fill="#ffffff" stroke="#1f2d47" stroke-width="2.5" />
+            <circle cx="340" cy="196" r="6" fill="#ffffff" stroke="#1f2d47" stroke-width="2.5" />
+            <circle cx="480" cy="175" r="6" fill="#ffffff" stroke="#1f2d47" stroke-width="2.5" />
+            <circle cx="580" cy="30" r="6" fill="#ffffff" stroke="#1f2d47" stroke-width="2.5" />
+            <text x="60" y="62" text-anchor="middle" fill="#8ec7ff" font-size="13" font-weight="700">R</text>
+            <text x="200" y="188" text-anchor="middle" fill="#8ec7ff" font-size="13" font-weight="700">E</text>
+            <text x="340" y="216" text-anchor="middle" fill="#8ec7ff" font-size="13" font-weight="700">A</text>
+            <text x="480" y="195" text-anchor="middle" fill="#8ec7ff" font-size="13" font-weight="700">D</text>
+            <text x="580" y="18" text-anchor="middle" fill="#8ec7ff" font-size="13" font-weight="700">Y</text>
+          </svg>
+        </div>
+        <p>Now imagine your guess line sitting on top of that answer. You are trying to push your guessed points into the same positions as the answer points.</p>
+      </div>
+
+      <div class="example-block">
+        <h3>Example With One Guess</h3>
+        <p>Here the answer is still <strong style="color: var(--ink);">READY</strong>, and the guess is <strong style="color: var(--ink);">DRAFT</strong>. Only the middle letter <strong style="color: var(--ink);">A</strong> is in the exact same position, so only that spot turns green.</p>
+        <div class="example-graph">
+          <svg viewBox="0 0 620 220" aria-label="Example answer graph with one guess">
+            <line x1="36" y1="24" x2="36" y2="196" stroke="rgba(255,255,255,0.18)" />
+            <line x1="36" y1="24" x2="596" y2="24" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
+            <line x1="36" y1="110" x2="596" y2="110" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
+            <line x1="36" y1="196" x2="596" y2="196" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
+            <path d="M 60 82 C 130 82, 130 168, 200 168 C 270 168, 270 196, 340 196 C 410 196, 410 175, 480 175 C 545 175, 545 30, 580 30" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
+            <path d="M 60 175 C 130 175, 130 82, 200 82 C 270 82, 270 196, 340 196 C 410 196, 410 161, 480 161 C 545 161, 545 68, 580 68" fill="none" stroke="#89cbff" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="340" cy="196" r="7" fill="#6aaa64" stroke="#1f2d47" stroke-width="2.5" />
+            <text x="340" y="184" text-anchor="middle" fill="#8ec7ff" font-size="13" font-weight="700">A</text>
+          </svg>
+        </div>
+        <div class="example-row">
+          <div class="example-tile" style="background: var(--blue); border-color: var(--blue); color: #17364d;">D</div>
+          <div class="example-tile" style="background: var(--blue); border-color: var(--blue); color: #17364d;">R</div>
+          <div class="example-tile" style="background: #6aaa64; border-color: #6aaa64; color: #102414;">A</div>
+          <div class="example-tile" style="background: var(--blue); border-color: var(--blue); color: #17364d;">F</div>
+          <div class="example-tile" style="background: var(--blue); border-color: var(--blue); color: #17364d;">T</div>
+        </div>
+      </div>
+
+      <div class="example-block">
+        <h3>How To Use The Board</h3>
+        <p>Your guess history is kept below the graph so you can remember what you tried. The toggle on the left of each row lets you show or hide that guess line on the chart.</p>
+        <div class="example-row">
+          <div class="example-tile" style="background: var(--red); border-color: var(--red); color: #521720;">R</div>
+          <div class="example-tile" style="background: var(--red); border-color: var(--red); color: #521720;">E</div>
+          <div class="example-tile" style="background: #6aaa64; border-color: #6aaa64; color: #102414;">A</div>
+          <div class="example-tile" style="background: var(--red); border-color: var(--red); color: #521720;">D</div>
+          <div class="example-tile" style="background: var(--red); border-color: var(--red); color: #521720;">Y</div>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-card">
+            <strong>Step 1</strong>
+            Read the white answer graph first and notice where each point sits from low to high.
+          </div>
+          <div class="detail-card">
+            <strong>Step 2</strong>
+            Tap the current row in the board and type a five-letter word. Press Enter to submit it.
+          </div>
+          <div class="detail-card">
+            <strong>Step 3</strong>
+            Your guess appears below the graph and also becomes a colored line on the chart.
+          </div>
+          <div class="detail-card">
+            <strong>Step 4</strong>
+            Exact matches turn green. If a row is not green, adjust the heights and letters in your next guess.
+          </div>
+        </div>
+      </div>
+
+      <div class="signature-wrap">
+        <label class="signature-label" for="playerNameInput">Test Words Out To See How They Form On A Graph</label>
+        <div class="signature-row">
+          <input id="playerNameInput" class="signature-input" type="text" maxlength="24" placeholder="Type any word or phrase">
+          <button id="clearSignature" class="action-btn" type="button">Reset</button>
+        </div>
+        <div class="signature-preview">
+          <svg id="signatureGraph" viewBox="0 0 620 120" aria-label="Signature graph preview"></svg>
+        </div>
+        <p id="signatureNote" class="signature-note">Type anything here and it will turn into a little preview graph below.</p>
+      </div>
+
+      <div class="modal-actions">
+        <button id="closeRules" class="action-btn" type="button">Start Game</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultOverlay" class="overlay result-overlay" hidden>
+    <div class="modal">
+      <h2 id="resultTitle">Round Complete</h2>
+      <p id="resultText"></p>
+      <div class="example-block">
+        <h3>Answer</h3>
+        <p id="resultWord"></p>
+        <div class="result-graph">
+          <svg id="resultGraph" viewBox="0 0 620 220" aria-label="Round result graph"></svg>
+        </div>
+        <p id="resultCaption" class="result-caption"></p>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-card">
+          <strong>Tries Used</strong>
+          <span id="resultTries"></span>
+        </div>
+        <div class="detail-card">
+          <strong>Result</strong>
+          <span id="resultMode"></span>
+        </div>
+        <div class="detail-card">
+          <strong>Exact Point Matches</strong>
+          <span id="resultMatches"></span>
+        </div>
+        <div class="detail-card">
+          <strong>Last Guess</strong>
+          <span id="resultLastGuess"></span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="playAgain" class="action-btn" type="button">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="settingsOverlay" class="overlay" hidden>
+    <div class="modal">
+      <h2>Settings</h2>
+      <p>Adjust the look and difficulty of the game here.</p>
+      <div class="settings-row">
+        <label class="setting-item">
+          <div>
+            <strong>Light Mode</strong>
+            <span>Switch the board and panels to a brighter palette.</span>
+          </div>
+          <input id="lightModeToggle" class="toggle" type="checkbox">
+        </label>
+        <label class="setting-item">
+          <div>
+            <strong>Easy Mode</strong>
+            <span>Use the smaller set of more common answer words for both answers and guesses.</span>
+          </div>
+          <input id="easyModeToggle" class="toggle" type="checkbox">
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button id="closeSettings" class="action-btn" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="words.js"></script>
+  <script>
+    const svg = document.getElementById("graph");
+    const toastLayer = document.getElementById("toastLayer");
+    const board = document.getElementById("board");
+    const boardShell = document.getElementById("boardShell");
+    const status = document.getElementById("status");
+    const hintRow = document.getElementById("hintRow");
+    const input = document.getElementById("wordInput");
+    const newGameButton = document.getElementById("newGame");
+    const settingsButton = document.getElementById("settingsButton");
+    const helpButton = document.getElementById("helpButton");
+    const startOverlay = document.getElementById("startOverlay");
+    const startPlayButton = document.getElementById("startPlay");
+    const startTutorialButton = document.getElementById("startTutorial");
+    const rulesOverlay = document.getElementById("rulesOverlay");
+    const closeRulesButton = document.getElementById("closeRules");
+    const playerNameInput = document.getElementById("playerNameInput");
+    const clearSignatureButton = document.getElementById("clearSignature");
+    const signatureGraph = document.getElementById("signatureGraph");
+    const signatureNote = document.getElementById("signatureNote");
+    const resultOverlay = document.getElementById("resultOverlay");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultText = document.getElementById("resultText");
+    const resultWord = document.getElementById("resultWord");
+    const resultGraph = document.getElementById("resultGraph");
+    const resultCaption = document.getElementById("resultCaption");
+    const resultTries = document.getElementById("resultTries");
+    const resultMode = document.getElementById("resultMode");
+    const resultMatches = document.getElementById("resultMatches");
+    const resultLastGuess = document.getElementById("resultLastGuess");
+    const playAgainButton = document.getElementById("playAgain");
+    const settingsOverlay = document.getElementById("settingsOverlay");
+    const closeSettingsButton = document.getElementById("closeSettings");
+    const lightModeToggle = document.getElementById("lightModeToggle");
+    const easyModeToggle = document.getElementById("easyModeToggle");
+
+    const WIDTH = 720;
+    const HEIGHT = 380;
+    const PADDING_X = 52;
+    const PADDING_Y = 30;
+    const GRID_LINES = 5;
+    const MAX_GUESSES = 6;
+    const MAX_ACTIVE_LINES = 3;
+    const GUESS_COLORS = [
+      { label: "Guess 1", color: "#89cbff", note: "blue" },
+      { label: "Guess 2", color: "#ff8d98", note: "red" },
+      { label: "Guess 3", color: "#ffe18a", note: "yellow" },
+      { label: "Guess 4", color: "#92f2bc", note: "green" },
+      { label: "Guess 5", color: "#d7b3ff", note: "purple" },
+      { label: "Guess 6", color: "#ffc18c", note: "orange" }
+    ];
+    const WORDS = [
+      "ANGLE", "BRAIN", "CABIN", "CHIME", "CURVE", "DREAM", "FLARE", "GLASS",
+      "GHOST", "GRAIN", "LEVEL", "LIGHT", "MANGO", "NERVE", "OCEAN", "PIXEL",
+      "PLAIN", "RIVER", "SHAPE", "SHINE", "SKYER", "SPARK", "SWING", "TRACE"
+    ];
+    const FULL_WORDS = Array.isArray(window.CURVELE_WORDS) && window.CURVELE_WORDS.length
+      ? window.CURVELE_WORDS
+      : WORDS;
+
+    const state = {
+      secret: "",
+      guesses: [],
+      isOver: false,
+      activeGuessIndices: [],
+      lastAnimatedGuessIndex: -1,
+      lightMode: false,
+      easyMode: false,
+      playerName: "",
+      allowedWords: new Set(FULL_WORDS),
+      fullAllowedWords: new Set(FULL_WORDS),
+      answers: [...WORDS]
+    };
+
+    function sanitizeWord(raw) {
+      return raw.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 5);
+    }
+
+    function toValue(char) {
+      return char.charCodeAt(0) - 65;
+    }
+
+    function buildPoints(word) {
+      const stepX = (WIDTH - PADDING_X * 2) / 4;
+      return word.split("").map((char, index) => {
+        const value = toValue(char);
+        const normalized = value / 25;
+        return {
+          x: PADDING_X + stepX * index,
+          y: HEIGHT - PADDING_Y - normalized * (HEIGHT - PADDING_Y * 2)
+        };
+      });
+    }
+
+    function pathFromPoints(points) {
+      if (!points.length) return "";
+      let path = `M ${points[0].x} ${points[0].y}`;
+      for (let i = 0; i < points.length - 1; i += 1) {
+        const current = points[i];
+        const next = points[i + 1];
+        const cx1 = current.x + (next.x - current.x) / 2;
+        const cy1 = current.y;
+        const cx2 = current.x + (next.x - current.x) / 2;
+        const cy2 = next.y;
+        path += ` C ${cx1} ${cy1}, ${cx2} ${cy2}, ${next.x} ${next.y}`;
+      }
+      return path;
+    }
+
+    function buildScaledSignaturePoints(name, width, height, paddingX, paddingY) {
+      const chars = name.toUpperCase().replace(/[^A-Z]/g, "");
+      const letters = chars.split("");
+      if (!letters.length) return [];
+      const stepX = letters.length === 1 ? 0 : (width - paddingX * 2) / (letters.length - 1);
+      return letters.map((char, index) => {
+        const value = Math.max(0, Math.min(25, toValue(char)));
+        const normalized = value / 25;
+        return {
+          x: paddingX + stepX * index,
+          y: height - paddingY - normalized * (height - paddingY * 2)
+        };
+      });
+    }
+
+    function countExactMatches(word, secret) {
+      let total = 0;
+      for (let i = 0; i < 5; i += 1) {
+        if (word && word[i] === secret[i]) {
+          total += 1;
+        }
+      }
+      return total;
+    }
+
+    function letterForGridLine(index) {
+      const normalized = 1 - (index / (GRID_LINES - 1));
+      const value = Math.round(normalized * 25);
+      return String.fromCharCode(65 + value);
+    }
+
+    function easyModeMarks() {
+      return [
+        { label: "Z", y: PADDING_Y },
+        { label: "R", y: PADDING_Y + (HEIGHT - PADDING_Y * 2) / 3 },
+        { label: "I", y: PADDING_Y + (HEIGHT - PADDING_Y * 2) * 2 / 3 },
+        { label: "A", y: HEIGHT - PADDING_Y }
+      ];
+    }
+
+    function gridMarkup() {
+      const lines = [];
+      if (state.easyMode) {
+        easyModeMarks().forEach((mark) => {
+          lines.push(`<line x1="${PADDING_X - 4}" y1="${mark.y}" x2="${PADDING_X + 72}" y2="${mark.y}" stroke="var(--grid)" stroke-width="1.2" stroke-dasharray="6 8" />`);
+          lines.push(`<text x="${PADDING_X - 28}" y="${mark.y + 5}" fill="var(--muted)" font-size="14" font-weight="800">${mark.label}</text>`);
+        });
+      } else {
+        for (let i = 0; i < GRID_LINES; i += 1) {
+          const y = PADDING_Y + (i * (HEIGHT - PADDING_Y * 2)) / (GRID_LINES - 1);
+          lines.push(`<line x1="${PADDING_X}" y1="${y}" x2="${WIDTH - PADDING_X}" y2="${y}" stroke="var(--grid)" stroke-width="1" stroke-dasharray="6 8" />`);
+        }
+      }
+      return lines.join("");
+    }
+
+    function renderGraph() {
+      const targetPoints = buildPoints(state.secret);
+      const targetPath = pathFromPoints(targetPoints);
+      const activeSet = new Set(state.activeGuessIndices);
+      const matchedPositions = Array(5).fill(false);
+      const answerOutline = document.body.classList.contains("light-mode") ? "#1c2a44" : "rgba(0,0,0,0.32)";
+
+      state.guesses.forEach((guess) => {
+        for (let i = 0; i < 5; i += 1) {
+          if (guess.word[i] === state.secret[i]) {
+            matchedPositions[i] = true;
+          }
+        }
+      });
+
+      const guessMarkup = state.guesses.map((guess, index) => {
+        const points = buildPoints(guess.word);
+        const path = pathFromPoints(points);
+        const active = activeSet.has(index);
+        const opacity = active ? 0.96 : 0.16;
+        const strokeWidth = active ? 6 : 4;
+        const circleOpacity = active ? 0.95 : 0.14;
+        const shouldAnimate = index === state.lastAnimatedGuessIndex;
+        const animationStyle = shouldAnimate ? `stroke-dasharray: var(--path-length); stroke-dashoffset: var(--path-length); animation: drawLine 2200ms ease forwards;` : "";
+        return `
+          <path d="${path}" fill="none" stroke="${guess.color}" stroke-width="${strokeWidth}" stroke-linecap="round" opacity="${opacity}" pathLength="100" style="--path-length: 100; ${animationStyle}" />
+          ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="${active ? 6 : 5}" fill="${guess.color}" fill-opacity="${circleOpacity}" stroke="var(--point-stroke)" stroke-width="2.5" />`).join("")}
+        `;
+      }).join("");
+
+      svg.innerHTML = `
+        ${gridMarkup()}
+        ${guessMarkup}
+        <path d="${targetPath}" fill="none" stroke="${answerOutline}" stroke-width="12" stroke-linecap="round" opacity="${document.body.classList.contains("light-mode") ? "0.34" : "0.22"}" />
+        <path d="${targetPath}" fill="none" stroke="${getComputedStyle(document.documentElement).getPropertyValue("--white-line").trim() || "#ffffff"}" stroke-width="8" stroke-linecap="round" />
+        ${targetPoints.map((point, index) => `<circle cx="${point.x}" cy="${point.y}" r="7" fill="${matchedPositions[index] ? "#6aaa64" : "#ffffff"}" stroke="var(--point-stroke)" stroke-width="3" />`).join("")}
+      `;
+    }
+
+    function renderBoard() {
+      const rows = [];
+      for (let i = 0; i < MAX_GUESSES; i += 1) {
+        const guess = state.guesses[i];
+        const activeRow = i === state.guesses.length && !state.isOver;
+        const preview = activeRow ? sanitizeWord(input.value) : "";
+        const cells = [];
+        const exists = i < state.guesses.length;
+        const active = state.activeGuessIndices.includes(i);
+
+        for (let j = 0; j < 5; j += 1) {
+          const char = guess ? guess.word[j] : (preview[j] || "");
+          const klass = [
+            char ? "filled" : "",
+            guess ? `guess-${i}` : "",
+            guess && guess.word[j] === state.secret[j] ? "exact" : ""
+          ].filter(Boolean).join(" ");
+          cells.push(`<div class="guess-tile ${klass}">${char}</div>`);
+        }
+
+        rows.push(`
+          <div class="guess-line">
+            <button class="selector-chip ${exists ? (active ? "active" : "inactive") : "pending"} guess-${i}" data-index="${i}" type="button">
+              <strong>Guess ${i + 1}</strong>
+              <span>${exists ? (active ? "tap to hide" : "tap to show") : (activeRow ? "tap row to type" : "waiting")}</span>
+            </button>
+            <div class="guess-row" data-guess-row="${i}">${cells.join("")}</div>
+          </div>
+        `);
+      }
+      board.innerHTML = rows.join("");
+      board.querySelectorAll("[data-index]").forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const index = Number(button.dataset.index);
+          if (index < state.guesses.length) {
+            activateGuess(index);
+          } else if (index === state.guesses.length && !state.isOver) {
+            input.focus();
+          }
+        });
+      });
+      board.querySelectorAll("[data-guess-row]").forEach((row) => {
+        row.addEventListener("click", () => {
+          if (!state.isOver && Number(row.dataset.guessRow) === state.guesses.length) {
+            input.focus();
+          }
+        });
+      });
+    }
+
+    function setStatus(message) {
+      status.textContent = "You have six tries to guess the five-letter word using the charts.";
+    }
+
+    function setHint(message) {
+      hintRow.textContent = message;
+    }
+
+    function showToast(message) {
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      toastLayer.appendChild(toast);
+      setTimeout(() => {
+        toast.remove();
+      }, 2300);
+    }
+
+    function randomWord() {
+      return state.answers[Math.floor(Math.random() * state.answers.length)];
+    }
+
+    function syncActiveGuessesAfterAdd() {
+      const newestIndex = state.guesses.length - 1;
+      state.activeGuessIndices = state.activeGuessIndices.filter((index) => index < newestIndex + 1);
+      state.activeGuessIndices.push(newestIndex);
+      while (state.activeGuessIndices.length > MAX_ACTIVE_LINES) {
+        state.activeGuessIndices.shift();
+      }
+    }
+
+    function activateGuess(index) {
+      if (index >= state.guesses.length) return;
+      const existingIndex = state.activeGuessIndices.indexOf(index);
+      if (existingIndex !== -1) {
+        state.activeGuessIndices.splice(existingIndex, 1);
+      } else {
+        state.activeGuessIndices.push(index);
+        while (state.activeGuessIndices.length > MAX_ACTIVE_LINES) {
+          state.activeGuessIndices.shift();
+        }
+      }
+      renderGraph();
+      setHint("Bright cards are the lines currently emphasized on the graph. Faded ones still linger in the background.");
+    }
+
+    function renderResultGraph() {
+      const answerPoints = buildPoints(state.secret).map((point) => ({
+        x: 34 + ((point.x - PADDING_X) / (WIDTH - PADDING_X * 2)) * 552,
+        y: 24 + ((point.y - PADDING_Y) / (HEIGHT - PADDING_Y * 2)) * 172
+      }));
+      const answerPath = pathFromPoints(answerPoints);
+      const latestGuess = state.guesses[state.guesses.length - 1];
+      const latestGuessPoints = latestGuess
+        ? buildPoints(latestGuess.word).map((point) => ({
+            x: 34 + ((point.x - PADDING_X) / (WIDTH - PADDING_X * 2)) * 552,
+            y: 24 + ((point.y - PADDING_Y) / (HEIGHT - PADDING_Y * 2)) * 172
+          }))
+        : [];
+      const latestGuessPath = latestGuessPoints.length ? pathFromPoints(latestGuessPoints) : "";
+      const answerOutline = document.body.classList.contains("light-mode") ? "#1c2a44" : "rgba(0,0,0,0.32)";
+
+      resultGraph.innerHTML = `
+        <line x1="34" y1="24" x2="34" y2="196" stroke="rgba(255,255,255,0.18)" />
+        <line x1="34" y1="24" x2="586" y2="24" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
+        <line x1="34" y1="110" x2="586" y2="110" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
+        <line x1="34" y1="196" x2="586" y2="196" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
+        <text x="8" y="30" fill="var(--muted)" font-size="14" font-weight="700">Z</text>
+        <text x="10" y="196" fill="var(--muted)" font-size="14" font-weight="700">A</text>
+        ${latestGuessPath ? `<path d="${latestGuessPath}" fill="none" stroke="${latestGuess.color}" stroke-width="5" stroke-linecap="round" opacity="0.8" />` : ""}
+        <path d="${answerPath}" fill="none" stroke="${answerOutline}" stroke-width="11" stroke-linecap="round" opacity="${document.body.classList.contains("light-mode") ? "0.34" : "0.22"}" />
+        <path d="${answerPath}" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" />
+        ${answerPoints.map((point, index) => `<circle cx="${point.x}" cy="${point.y}" r="6" fill="${latestGuess && latestGuess.word[index] === state.secret[index] ? "#6aaa64" : "#ffffff"}" stroke="var(--point-stroke)" stroke-width="2.5" />`).join("")}
+      `;
+    }
+
+    function renderSignatureGraph() {
+      const name = state.playerName.trim();
+      if (!name) {
+        signatureGraph.innerHTML = `
+          <text x="12" y="68" fill="var(--muted)" font-size="18" font-weight="700">
+            Preview graph appears here as you test words.
+          </text>
+        `;
+        signatureNote.textContent = "Type anything here and it will turn into a little preview graph below.";
+        return;
+      }
+
+      const points = buildScaledSignaturePoints(name, 620, 120, 22, 20);
+      const path = pathFromPoints(points);
+      signatureGraph.innerHTML = `
+        <line x1="18" y1="20" x2="18" y2="100" stroke="rgba(255,255,255,0.12)" />
+        <line x1="18" y1="20" x2="600" y2="20" stroke="rgba(255,255,255,0.08)" stroke-dasharray="5 8" />
+        <line x1="18" y1="60" x2="600" y2="60" stroke="rgba(255,255,255,0.08)" stroke-dasharray="5 8" />
+        <line x1="18" y1="100" x2="600" y2="100" stroke="rgba(255,255,255,0.08)" stroke-dasharray="5 8" />
+        <text x="0" y="26" fill="var(--muted)" font-size="12" font-weight="700">Z</text>
+        <text x="2" y="100" fill="var(--muted)" font-size="12" font-weight="700">A</text>
+        <path d="${path}" fill="none" stroke="#8ec7ff" stroke-width="7" stroke-linecap="round" />
+        ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="4.5" fill="#8ec7ff" stroke="var(--point-stroke)" stroke-width="2" />`).join("")}
+      `;
+      signatureNote.textContent = `${name} is shown as a little graph preview below.`;
+    }
+
+    function showResult(win) {
+      const latestGuess = state.guesses[state.guesses.length - 1];
+      const exactMatches = latestGuess ? countExactMatches(latestGuess.word, state.secret) : 0;
+      resultTitle.textContent = win ? "You Solved It" : "Round Over";
+      resultText.textContent = win
+        ? `Nice work${state.playerName ? `, ${state.playerName}` : ""}. Your final guess matched the hidden curve and spelled the correct word.`
+        : `${state.playerName ? `${state.playerName}, ` : ""}you used all six tries before landing on the correct word.`;
+      resultWord.textContent = `The word was ${state.secret}.`;
+      resultTries.textContent = `${state.guesses.length} of ${MAX_GUESSES}`;
+      resultMode.textContent = win ? "Win" : "Loss";
+      resultMatches.textContent = `${exactMatches} of 5 points matched on your last guess`;
+      resultLastGuess.textContent = latestGuess ? latestGuess.word : "No final guess";
+      resultCaption.textContent = latestGuess
+        ? `The white line is the answer. The colored line shows your final guess, and any green points mark exact position matches.`
+        : `The white line is the answer graph for this round.`;
+      renderResultGraph();
+      resultOverlay.hidden = false;
+    }
+
+    function applySettings() {
+      document.body.classList.toggle("light-mode", state.lightMode);
+      state.answers = state.easyMode ? [...WORDS] : [...FULL_WORDS];
+      state.allowedWords = new Set(state.fullAllowedWords);
+      lightModeToggle.checked = state.lightMode;
+      easyModeToggle.checked = state.easyMode;
+      renderGraph();
+      renderBoard();
+    }
+
+    function resetGame() {
+      state.secret = randomWord();
+      state.guesses = [];
+      state.isOver = false;
+      state.activeGuessIndices = [];
+      state.lastAnimatedGuessIndex = -1;
+      input.value = "";
+      resultOverlay.hidden = true;
+      renderGraph();
+      renderBoard();
+      setStatus("You have 6 tries to guess the five-letter word.");
+      setHint(state.easyMode
+        ? "Easy mode is on, so the graph shows the middle guide letter. You can still guess any real five-letter word."
+        : "Tap the current row to type a real five-letter word, then compare your colored line to the white answer line.");
+      input.focus();
+    }
+
+    function submitGuess() {
+      if (state.isOver) {
+        setStatus(`This round is over. Press New Word to play again. The word was ${state.secret}.`);
+        return;
+      }
+
+      const guess = sanitizeWord(input.value);
+      input.value = guess;
+
+      if (guess.length !== 5) {
+        showToast("Type a five-letter word");
+        renderBoard();
+        return;
+      }
+
+      if (state.guesses.some((entry) => entry.word === guess)) {
+        showToast("You already guessed that word");
+        return;
+      }
+
+      if (!state.allowedWords.has(guess)) {
+        showToast("Not in word list");
+        return;
+      }
+
+      state.guesses.push({
+        word: guess,
+        color: GUESS_COLORS[state.guesses.length].color
+      });
+      state.lastAnimatedGuessIndex = state.guesses.length - 1;
+      syncActiveGuessesAfterAdd();
+
+      if (guess === state.secret) {
+        state.isOver = true;
+        setStatus(`Correct. You found ${state.secret}.`);
+        setHint("That round is complete.");
+      } else if (state.guesses.length === MAX_GUESSES) {
+        state.isOver = true;
+        setStatus("Incorrect. You are out of guesses.");
+        setHint("That round is complete.");
+      } else {
+        setStatus(`Incorrect. ${MAX_GUESSES - state.guesses.length} tries left.`);
+        setHint("Use the guess cards to spotlight older lines if you want to compare them again.");
+      }
+
+      input.value = "";
+      renderGraph();
+      renderBoard();
+
+      if (state.isOver) {
+        showResult(guess === state.secret);
+      } else {
+        input.focus();
+      }
+    }
+
+    input.addEventListener("input", (event) => {
+      event.target.value = sanitizeWord(event.target.value);
+      renderBoard();
+    });
+
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        submitGuess();
+      }
+    });
+
+    boardShell.addEventListener("click", () => {
+      if (!state.isOver) {
+        input.focus();
+      }
+    });
+    newGameButton.addEventListener("click", resetGame);
+    settingsButton.addEventListener("click", () => {
+      settingsOverlay.hidden = false;
+    });
+    helpButton.addEventListener("click", () => {
+      startOverlay.hidden = true;
+      rulesOverlay.hidden = false;
+    });
+    closeRulesButton.addEventListener("click", () => {
+      rulesOverlay.hidden = true;
+      input.focus();
+    });
+    startPlayButton.addEventListener("click", () => {
+      startOverlay.hidden = true;
+      rulesOverlay.hidden = true;
+      input.focus();
+    });
+    startTutorialButton.addEventListener("click", () => {
+      startOverlay.hidden = true;
+      rulesOverlay.hidden = false;
+    });
+    playerNameInput.addEventListener("input", (event) => {
+      state.playerName = event.target.value.replace(/\s+/g, " ").trimStart().slice(0, 24);
+      event.target.value = state.playerName;
+      renderSignatureGraph();
+    });
+    clearSignatureButton.addEventListener("click", () => {
+      state.playerName = "";
+      playerNameInput.value = "";
+      renderSignatureGraph();
+      playerNameInput.focus();
+    });
+    playAgainButton.addEventListener("click", resetGame);
+    closeSettingsButton.addEventListener("click", () => {
+      settingsOverlay.hidden = true;
+      input.focus();
+    });
+    lightModeToggle.addEventListener("change", (event) => {
+      state.lightMode = event.target.checked;
+      applySettings();
+    });
+    easyModeToggle.addEventListener("change", (event) => {
+      state.easyMode = event.target.checked;
+      applySettings();
+      resetGame();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (startOverlay.hidden && rulesOverlay.hidden && settingsOverlay.hidden && resultOverlay.hidden && !state.isOver) {
+        const isTypingKey = event.key.length === 1 || event.key === "Backspace";
+        if (isTypingKey && document.activeElement !== input) {
+          input.focus();
+        }
+      }
+    });
+
+    applySettings();
+    resetGame();
+    renderSignatureGraph();
+  </script>
+</body>
+</html>
