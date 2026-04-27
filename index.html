@@ -230,6 +230,41 @@
       height: 1px;
     }
 
+    .keyboard {
+      width: 100%;
+      max-width: 780px;
+      display: grid;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .keyboard[hidden] {
+      display: none;
+    }
+
+    .keyboard-row {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+
+    .key-btn {
+      min-width: 34px;
+      height: 48px;
+      border-radius: 12px;
+      border: 1px solid rgba(143, 162, 198, 0.16);
+      background: linear-gradient(180deg, var(--panel-3), var(--panel));
+      color: var(--ink);
+      font-weight: 800;
+      cursor: pointer;
+      padding: 0 10px;
+    }
+
+    .key-btn.wide {
+      min-width: 78px;
+    }
+
     .hint-row {
       color: var(--muted);
       font-size: 0.96rem;
@@ -391,6 +426,11 @@
       background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), #6aaa64;
       border-color: #6aaa64;
       color: #102414;
+    }
+
+    .guess-tile.easter {
+      animation: rainbowFlash 1200ms linear infinite;
+      animation-delay: var(--flash-delay, 0ms);
     }
 
     #resultWord,
@@ -724,6 +764,34 @@
       animation: resultIn 360ms cubic-bezier(.2,.8,.2,1);
     }
 
+    .confirm-overlay {
+      z-index: 35;
+      background: rgba(5, 9, 18, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .confirm-modal {
+      width: min(420px, 100%);
+      text-align: center;
+      padding: 28px 24px 22px;
+      animation: resultIn 220ms cubic-bezier(.2,.8,.2,1);
+    }
+
+    .confirm-modal h2 {
+      margin-bottom: 10px;
+    }
+
+    .confirm-copy {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .confirm-actions {
+      justify-content: center;
+      margin-top: 18px;
+    }
+
     @keyframes resultIn {
       0% {
         opacity: 0;
@@ -765,6 +833,16 @@
       }
     }
 
+    @keyframes rainbowFlash {
+      0% { color: #ff5f6d; }
+      16% { color: #ffb347; }
+      33% { color: #ffe066; }
+      50% { color: #4dff88; }
+      66% { color: #57c7ff; }
+      83% { color: #b88cff; }
+      100% { color: #ff5f6d; }
+    }
+
     @media (max-width: 720px) {
       .detail-grid {
         grid-template-columns: 1fr;
@@ -772,20 +850,179 @@
     }
 
     @media (max-width: 640px) {
+      .shell {
+        padding: 10px;
+      }
+
+      .topbar {
+        display: grid;
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 10px;
+        padding: 10px 0 14px;
+      }
+
+      .top-actions {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .icon-btn,
+      .action-btn {
+        padding: 10px 13px;
+      }
+
       .graph-card {
-        padding-left: 46px;
+        padding: 16px 12px 12px 40px;
+      }
+
+      .axis-label {
+        left: 12px;
+        font-size: 0.8rem;
+      }
+
+      .board-shell {
+        padding: 12px;
+      }
+
+      .board-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .board-copy,
+      .hint-row,
+      .status {
+        font-size: 0.89rem;
       }
 
       .guess-line {
-        grid-template-columns: 98px minmax(320px, 1fr);
+        grid-template-columns: 72px minmax(0, 1fr);
+        gap: 8px;
       }
 
       .selector-chip {
-        width: 98px;
+        width: 72px;
+        min-height: 60px;
+        font-size: 0.7rem;
+        padding: 8px 6px;
+      }
+
+      .selector-chip strong {
+        font-size: 0.74rem;
+      }
+
+      .selector-chip span {
+        font-size: 0.64rem;
+      }
+
+      .guess-row {
+        min-width: 0;
+        gap: 8px;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
       }
 
       .guess-tile {
-        font-size: 1.4rem;
+        font-size: 1.22rem;
+        border-radius: 14px;
+      }
+
+      .keyboard {
+        position: sticky;
+        bottom: 0;
+        z-index: 3;
+        gap: 6px;
+        padding: 10px 8px calc(10px + env(safe-area-inset-bottom, 0px));
+        border-radius: 18px 18px 0 0;
+        background: linear-gradient(180deg, rgba(8, 12, 24, 0.18), rgba(8, 12, 24, 0.84));
+        backdrop-filter: blur(12px);
+      }
+
+      body.light-mode .keyboard {
+        background: linear-gradient(180deg, rgba(232, 239, 250, 0.35), rgba(220, 232, 248, 0.92));
+      }
+
+      .keyboard-row {
+        gap: 4px;
+      }
+
+      .key-btn {
+        min-width: 0;
+        flex: 1 1 0;
+        height: 44px;
+        padding: 0 4px;
+        font-size: 0.95rem;
+      }
+
+      .key-btn.wide {
+        flex: 1.45 1 0;
+        min-width: 56px;
+      }
+
+      .modal {
+        padding: 20px 16px;
+        border-radius: 22px;
+      }
+
+      .example-row {
+        gap: 6px;
+      }
+
+      .example-tile {
+        border-radius: 12px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .shell {
+        padding: 8px;
+      }
+
+      .graph-card {
+        padding: 14px 10px 10px 34px;
+      }
+
+      .axis-label {
+        left: 9px;
+        font-size: 0.74rem;
+      }
+
+      .board-shell {
+        padding: 10px;
+      }
+
+      .guess-line {
+        grid-template-columns: 66px minmax(0, 1fr);
+      }
+
+      .selector-chip {
+        width: 66px;
+        min-height: 56px;
+        font-size: 0.66rem;
+      }
+
+      .selector-chip strong {
+        font-size: 0.68rem;
+      }
+
+      .selector-chip span {
+        font-size: 0.59rem;
+      }
+
+      .guess-row {
+        gap: 6px;
+      }
+
+      .guess-tile {
+        font-size: 1.05rem;
+        border-width: 1.5px;
+      }
+
+      .key-btn {
+        height: 40px;
+        font-size: 0.88rem;
       }
     }
   </style>
@@ -822,6 +1059,8 @@
           <div class="hint-row" id="hintRow">Tap the current row to type a real five-letter word, then compare your colored line to the white answer line.</div>
           <div class="board" id="board" aria-live="polite"></div>
         </div>
+
+        <div id="keyboard" class="keyboard" hidden></div>
 
         <p class="status status-fixed" id="status">You have six tries to guess the five-letter word using the charts.</p>
       </section>
@@ -1005,13 +1244,31 @@
         <label class="setting-item">
           <div>
             <strong>Easy Mode</strong>
-            <span>Use the smaller set of more common answer words for both answers and guesses.</span>
+            <span>Use the smaller set of more common answer words. You can still guess any allowed word.</span>
           </div>
           <input id="easyModeToggle" class="toggle" type="checkbox">
+        </label>
+        <label class="setting-item">
+          <div>
+            <strong>QWERTY Keyboard</strong>
+            <span>Switch the custom keyboard from alphabetical order to a QWERTY layout.</span>
+          </div>
+          <input id="qwertyToggle" class="toggle" type="checkbox">
         </label>
       </div>
       <div class="modal-actions">
         <button id="closeSettings" class="action-btn" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmOverlay" class="overlay confirm-overlay" hidden>
+    <div class="modal confirm-modal">
+      <h2 id="confirmTitle">Reset This Round?</h2>
+      <p id="confirmCopy" class="confirm-copy">Using this preview will reset the current word and clear your guesses.</p>
+      <div class="modal-actions confirm-actions">
+        <button id="confirmCancel" class="action-btn" type="button">Keep Playing</button>
+        <button id="confirmContinue" class="action-btn" type="button">Continue</button>
       </div>
     </div>
   </div>
@@ -1022,6 +1279,7 @@
     const toastLayer = document.getElementById("toastLayer");
     const board = document.getElementById("board");
     const boardShell = document.getElementById("boardShell");
+    const keyboard = document.getElementById("keyboard");
     const status = document.getElementById("status");
     const hintRow = document.getElementById("hintRow");
     const input = document.getElementById("wordInput");
@@ -1052,6 +1310,12 @@
     const closeSettingsButton = document.getElementById("closeSettings");
     const lightModeToggle = document.getElementById("lightModeToggle");
     const easyModeToggle = document.getElementById("easyModeToggle");
+    const qwertyToggle = document.getElementById("qwertyToggle");
+    const confirmOverlay = document.getElementById("confirmOverlay");
+    const confirmTitle = document.getElementById("confirmTitle");
+    const confirmCopy = document.getElementById("confirmCopy");
+    const confirmCancel = document.getElementById("confirmCancel");
+    const confirmContinue = document.getElementById("confirmContinue");
 
     const WIDTH = 720;
     const HEIGHT = 380;
@@ -1073,9 +1337,32 @@
       "GHOST", "GRAIN", "LEVEL", "LIGHT", "MANGO", "NERVE", "OCEAN", "PIXEL",
       "PLAIN", "RIVER", "SHAPE", "SHINE", "SKYER", "SPARK", "SWING", "TRACE"
     ];
+    const EASTER_WORD = "AIDEN";
+    const BANNED_WORDS = new Set([
+      "YECCH", "OGLES", "STOAE", "MASSE", "MUSOS", "AHHHH", "PFFFT", "SHMOO", "GOONY",
+      "GOOKS", "NERTS", "CUNTS", "WHORE", "KIKES", "FUCKS", "SPICS", "GONNA", "WANNA",
+      "KINDA", "MEBBE", "YOBBO", "WAZOO", "HOOEY", "BHOYS", "YOUSE", "WHOOO", "LOTSA",
+      "HOMOS", "PINKO", "MIMEO", "DORKY", "DORKS", "NINJA", "HOKEY", "BIMBO", "GOOFY",
+      "ZOWIE", "OUIJA", "MUJIK", "QOPHS", "XYLEM", "PSOAS", "UKASE", "OLEOS", "ETEXT",
+      "BAIZE", "LITHO", "VOXEL", "DIXIT", "UMIAK", "DJINN", "ZLOTY", "OXBOW", "IXNAY",
+      "KVELL", "JIHAD", "DHOWS", "YENTA", "MIAOW", "PSEUD", "KAPPA", "MUCUS", "CURIA"
+    ]);
     const FULL_WORDS = Array.isArray(window.CURVELE_WORDS) && window.CURVELE_WORDS.length
       ? window.CURVELE_WORDS
       : WORDS;
+    const ALLOWED_WORDS = [...new Set(FULL_WORDS.filter((word) => !BANNED_WORDS.has(word)).concat(EASTER_WORD))];
+    const KEYBOARD_LAYOUTS = {
+      abc: [
+        ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
+        ["K", "L", "M", "N", "O", "P", "Q", "R", "S"],
+        ["ENTER", "T", "U", "V", "W", "X", "Y", "Z", "BACK"]
+      ],
+      qwerty: [
+        ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+        ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+        ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "BACK"]
+      ]
+    };
 
     const state = {
       secret: "",
@@ -1085,9 +1372,15 @@
       lastAnimatedGuessIndex: -1,
       lightMode: false,
       easyMode: false,
+      keyboardLayout: "abc",
+      isTouchDevice: window.matchMedia("(pointer: coarse)").matches,
       playerName: "",
-      allowedWords: new Set(FULL_WORDS),
-      fullAllowedWords: new Set(FULL_WORDS),
+      previewNeedsResetWarning: true,
+      pendingResetAfterResult: false,
+      pendingPreviewValue: "",
+      pendingConfirmAction: null,
+      allowedWords: new Set(ALLOWED_WORDS),
+      fullAllowedWords: new Set(ALLOWED_WORDS),
       answers: [...WORDS]
     };
 
@@ -1236,9 +1529,11 @@
           const klass = [
             char ? "filled" : "",
             guess ? `guess-${i}` : "",
+            guess && guess.easter ? "easter" : "",
             guess && guess.word[j] === state.secret[j] ? "exact" : ""
           ].filter(Boolean).join(" ");
-          cells.push(`<div class="guess-tile ${klass}">${char}</div>`);
+          const delay = `${j * 110}ms`;
+          cells.push(`<div class="guess-tile ${klass}" style="--flash-delay: ${delay};">${char}</div>`);
         }
 
         rows.push(`
@@ -1288,6 +1583,47 @@
       setTimeout(() => {
         toast.remove();
       }, 2300);
+    }
+
+    function openConfirmDialog(options) {
+      confirmTitle.textContent = options.title;
+      confirmCopy.textContent = options.message;
+      state.pendingConfirmAction = options.onConfirm;
+      confirmOverlay.hidden = false;
+    }
+
+    function closeConfirmDialog() {
+      confirmOverlay.hidden = true;
+      state.pendingConfirmAction = null;
+    }
+
+    function renderKeyboard() {
+      keyboard.hidden = !state.isTouchDevice;
+      if (!state.isTouchDevice) return;
+      const rows = KEYBOARD_LAYOUTS[state.keyboardLayout].map((row) => `
+        <div class="keyboard-row">
+          ${row.map((key) => `<button class="key-btn ${key === "ENTER" || key === "BACK" ? "wide" : ""}" data-key="${key}" type="button">${key === "BACK" ? "⌫" : key}</button>`).join("")}
+        </div>
+      `).join("");
+      keyboard.innerHTML = rows;
+      keyboard.querySelectorAll("[data-key]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const key = button.dataset.key;
+          if (key === "ENTER") {
+            submitGuess();
+            return;
+          }
+          if (key === "BACK") {
+            input.value = input.value.slice(0, -1);
+            renderBoard();
+            return;
+          }
+          if (input.value.length < 5) {
+            input.value = `${input.value}${key}`;
+            renderBoard();
+          }
+        });
+      });
     }
 
     function randomWord() {
@@ -1375,11 +1711,13 @@
       signatureNote.textContent = `${name} is shown as a little graph preview below.`;
     }
 
-    function showResult(win) {
+    function showResult(win, mode = "normal") {
       const latestGuess = state.guesses[state.guesses.length - 1];
       const exactMatches = latestGuess ? countExactMatches(latestGuess.word, state.secret) : 0;
-      resultTitle.textContent = win ? "You Solved It" : "Round Over";
-      resultText.textContent = win
+      resultTitle.textContent = mode === "reset" ? "Round Reset" : (win ? "You Solved It" : "Round Over");
+      resultText.textContent = mode === "reset"
+        ? "You started a new round before finishing this one. Here is the final look at the previous answer and your latest guess."
+        : win
         ? `Nice work${state.playerName ? `, ${state.playerName}` : ""}. Your final guess matched the hidden curve and spelled the correct word.`
         : `${state.playerName ? `${state.playerName}, ` : ""}you used all six tries before landing on the correct word.`;
       resultWord.textContent = `The word was ${state.secret}.`;
@@ -1397,11 +1735,14 @@
     function applySettings() {
       document.body.classList.toggle("light-mode", state.lightMode);
       state.answers = state.easyMode ? [...WORDS] : [...FULL_WORDS];
+      state.answers = state.answers.filter((word) => word !== EASTER_WORD);
       state.allowedWords = new Set(state.fullAllowedWords);
       lightModeToggle.checked = state.lightMode;
       easyModeToggle.checked = state.easyMode;
+      qwertyToggle.checked = state.keyboardLayout === "qwerty";
       renderGraph();
       renderBoard();
+      renderKeyboard();
     }
 
     function resetGame() {
@@ -1410,10 +1751,12 @@
       state.isOver = false;
       state.activeGuessIndices = [];
       state.lastAnimatedGuessIndex = -1;
+      state.previewNeedsResetWarning = true;
       input.value = "";
       resultOverlay.hidden = true;
       renderGraph();
       renderBoard();
+      renderKeyboard();
       setStatus("You have 6 tries to guess the five-letter word.");
       setHint(state.easyMode
         ? "Easy mode is on, so the graph shows the middle guide letter. You can still guess any real five-letter word."
@@ -1448,7 +1791,8 @@
 
       state.guesses.push({
         word: guess,
-        color: GUESS_COLORS[state.guesses.length].color
+        color: GUESS_COLORS[state.guesses.length].color,
+        easter: guess === EASTER_WORD
       });
       state.lastAnimatedGuessIndex = state.guesses.length - 1;
       syncActiveGuessesAfterAdd();
@@ -1490,11 +1834,18 @@
     });
 
     boardShell.addEventListener("click", () => {
-      if (!state.isOver) {
+      if (!state.isOver && !state.isTouchDevice) {
         input.focus();
       }
     });
-    newGameButton.addEventListener("click", resetGame);
+    newGameButton.addEventListener("click", () => {
+      if (state.guesses.length > 0) {
+        state.pendingResetAfterResult = true;
+        showResult(state.guesses[state.guesses.length - 1]?.word === state.secret, "reset");
+      } else {
+        resetGame();
+      }
+    });
     settingsButton.addEventListener("click", () => {
       settingsOverlay.hidden = false;
     });
@@ -1516,6 +1867,22 @@
       rulesOverlay.hidden = false;
     });
     playerNameInput.addEventListener("input", (event) => {
+      if (state.guesses.length > 0 && state.previewNeedsResetWarning) {
+        state.pendingPreviewValue = event.target.value;
+        event.target.value = state.playerName;
+        openConfirmDialog({
+          title: "Reset The Current Round?",
+          message: "Trying a word in this preview will start a fresh round and clear the guesses you already made.",
+          onConfirm: () => {
+            state.previewNeedsResetWarning = false;
+            resetGame();
+            state.playerName = state.pendingPreviewValue.replace(/\s+/g, " ").trimStart().slice(0, 24);
+            playerNameInput.value = state.playerName;
+            renderSignatureGraph();
+          }
+        });
+        return;
+      }
       state.playerName = event.target.value.replace(/\s+/g, " ").trimStart().slice(0, 24);
       event.target.value = state.playerName;
       renderSignatureGraph();
@@ -1526,10 +1893,27 @@
       renderSignatureGraph();
       playerNameInput.focus();
     });
-    playAgainButton.addEventListener("click", resetGame);
+    playAgainButton.addEventListener("click", () => {
+      state.pendingResetAfterResult = false;
+      resetGame();
+    });
     closeSettingsButton.addEventListener("click", () => {
       settingsOverlay.hidden = true;
       input.focus();
+    });
+    confirmCancel.addEventListener("click", () => {
+      state.pendingPreviewValue = state.playerName;
+      playerNameInput.value = state.playerName;
+      closeConfirmDialog();
+      playerNameInput.focus();
+    });
+    confirmContinue.addEventListener("click", () => {
+      const action = state.pendingConfirmAction;
+      closeConfirmDialog();
+      if (typeof action === "function") {
+        action();
+      }
+      playerNameInput.focus();
     });
     lightModeToggle.addEventListener("change", (event) => {
       state.lightMode = event.target.checked;
@@ -1540,15 +1924,22 @@
       applySettings();
       resetGame();
     });
+    qwertyToggle.addEventListener("change", (event) => {
+      state.keyboardLayout = event.target.checked ? "qwerty" : "abc";
+      renderKeyboard();
+    });
     document.addEventListener("keydown", (event) => {
       if (startOverlay.hidden && rulesOverlay.hidden && settingsOverlay.hidden && resultOverlay.hidden && !state.isOver) {
         const isTypingKey = event.key.length === 1 || event.key === "Backspace";
-        if (isTypingKey && document.activeElement !== input) {
+        if (!state.isTouchDevice && isTypingKey && document.activeElement !== input) {
           input.focus();
         }
       }
     });
 
+    if (state.isTouchDevice) {
+      input.readOnly = true;
+    }
     applySettings();
     resetGame();
     renderSignatureGraph();
