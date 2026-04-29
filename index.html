@@ -49,6 +49,14 @@
       --point-stroke: #283853;
     }
 
+    body.high-contrast-guides {
+      --grid: rgba(255, 255, 255, 0.26);
+    }
+
+    body.light-mode.high-contrast-guides {
+      --grid: rgba(33, 53, 89, 0.42);
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -114,6 +122,7 @@
 
     .top-actions {
       display: flex;
+      align-items: center;
       gap: 10px;
     }
 
@@ -124,10 +133,18 @@
       color: var(--ink);
       border-radius: 14px;
       padding: 11px 15px;
+      position: relative;
+      overflow: hidden;
       cursor: pointer;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       transition: transform 120ms ease, filter 120ms ease;
       touch-action: manipulation;
+    }
+
+    .icon-btn > span,
+    .action-btn > span {
+      position: relative;
+      z-index: 1;
     }
 
     .icon-btn:hover,
@@ -238,6 +255,50 @@
       display: grid;
       gap: 8px;
       margin-top: 4px;
+    }
+
+    body.desktop-keyboard .shell {
+      padding-bottom: 300px;
+    }
+
+    body.desktop-keyboard .keyboard {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 20;
+      width: min(1120px, calc(100vw - 16px));
+      max-width: none;
+      margin: 0 auto;
+      gap: 10px;
+      padding: 16px 14px calc(16px + env(safe-area-inset-bottom, 0px));
+      border-radius: 24px 24px 0 0;
+      background: linear-gradient(180deg, rgba(8, 12, 24, 0.12), rgba(8, 12, 24, 0.94));
+      backdrop-filter: blur(16px);
+      box-shadow: 0 -18px 40px rgba(0, 0, 0, 0.32);
+    }
+
+    body.light-mode.desktop-keyboard .keyboard {
+      background: linear-gradient(180deg, rgba(232, 239, 250, 0.42), rgba(220, 232, 248, 0.96));
+      box-shadow: 0 -16px 30px rgba(83, 107, 150, 0.18);
+    }
+
+    body.desktop-keyboard .keyboard-row {
+      gap: 8px;
+    }
+
+    body.desktop-keyboard .key-btn {
+      min-width: 0;
+      flex: 1 1 0;
+      height: 68px;
+      font-size: 1.12rem;
+      border-radius: 16px;
+      padding: 0 8px;
+    }
+
+    body.desktop-keyboard .key-btn.wide {
+      flex: 1.4 1 0;
+      min-width: 118px;
     }
 
     .keyboard[hidden] {
@@ -515,6 +576,25 @@
       letter-spacing: 0.02em;
     }
 
+    .icon-btn.cooldown {
+      border-color: rgba(146, 242, 188, 0.5);
+    }
+
+    .icon-btn.cooldown::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(146, 242, 188, 0.96), rgba(106, 170, 100, 0.96));
+      transform-origin: left center;
+      transform: scaleX(var(--cooldown-scale, 1));
+      transition: transform 5s linear;
+      z-index: 0;
+    }
+
+    body.light-mode .icon-btn.cooldown::before {
+      background: linear-gradient(180deg, rgba(146, 242, 188, 0.9), rgba(106, 170, 100, 0.88));
+    }
+
     .toast-layer {
       position: fixed;
       top: 18px;
@@ -758,6 +838,34 @@
       margin-bottom: 6px;
     }
 
+    .daily-hero {
+      margin: 14px 0 18px;
+      padding: 18px 18px 20px;
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at top, rgba(142, 199, 255, 0.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid rgba(142, 199, 255, 0.24);
+      text-align: center;
+    }
+
+    .daily-hero strong {
+      display: block;
+      color: var(--muted);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      margin-bottom: 10px;
+    }
+
+    .daily-hero span {
+      display: block;
+      font-size: clamp(1.6rem, 6vw, 2.5rem);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+    }
+
     .result-graph {
       margin-top: 14px;
       border-radius: 16px;
@@ -824,6 +932,19 @@
 
     .result-overlay .modal {
       animation: resultIn 360ms cubic-bezier(.2,.8,.2,1);
+    }
+
+    .result-overlay {
+      overflow-y: auto;
+      align-items: start;
+      padding: max(12px, env(safe-area-inset-top, 0px)) 14px max(18px, env(safe-area-inset-bottom, 0px));
+    }
+
+    .result-overlay .modal {
+      margin: auto 0;
+      width: min(560px, 100%);
+      max-height: min(88vh, 820px);
+      overflow-y: auto;
     }
 
     .confirm-overlay {
@@ -1066,6 +1187,22 @@
         border-radius: 22px;
       }
 
+      .daily-hero {
+        padding: 16px 14px 18px;
+      }
+
+      .daily-hero span {
+        font-size: clamp(1.45rem, 7vw, 2rem);
+      }
+
+      .result-overlay {
+        padding: max(8px, env(safe-area-inset-top, 0px)) 8px max(14px, env(safe-area-inset-bottom, 0px));
+      }
+
+      .result-overlay .modal {
+        max-height: calc(100dvh - 22px);
+      }
+
       .example-row {
         gap: 6px;
       }
@@ -1142,6 +1279,10 @@
         height: 48px;
         font-size: 0.92rem;
       }
+
+      .result-overlay .modal {
+        max-height: calc(100dvh - 16px);
+      }
     }
   </style>
 </head>
@@ -1157,7 +1298,7 @@
         </div>
         <div class="top-actions">
           <button id="settingsButton" class="icon-btn" type="button">Settings</button>
-          <button id="newGame" class="icon-btn" type="button">New Word</button>
+          <button id="newGame" class="icon-btn" type="button"><span>New Word</span></button>
         </div>
       </header>
 
@@ -1190,11 +1331,11 @@
       <h2 class="start-title">Curvele</h2>
       <p class="start-byline">By Aiden Heller</p>
       <p class="start-copy">
-        Guess the hidden five-letter word by reading the graph shape. Compare your colored guess lines
-        against the white answer curve and solve it in six tries.
+        Guess the hidden five-letter word by reading the graph shape. Play the shared daily word first,
+        then switch into unlimited mode whenever you want extra rounds.
       </p>
       <div class="start-actions">
-        <button id="startPlay" class="action-btn" type="button">Play</button>
+        <button id="startPlay" class="action-btn" type="button">Play Daily</button>
         <button id="startTutorial" class="action-btn" type="button">Tutorial</button>
       </div>
     </div>
@@ -1315,6 +1456,10 @@
     <div class="modal">
       <h2 id="resultTitle">Round Complete</h2>
       <p id="resultText"></p>
+      <div id="dailyHero" class="daily-hero" hidden>
+        <strong id="dailyHeroLabel">Next Daily Word In</strong>
+        <span id="dailyHeroCountdown">24h 00m 00s</span>
+      </div>
       <div class="example-block">
         <h3>Answer</h3>
         <p id="resultWord"></p>
@@ -1339,6 +1484,10 @@
         <div class="detail-card">
           <strong>Last Guess</strong>
           <span id="resultLastGuess"></span>
+        </div>
+        <div class="detail-card">
+          <strong>Next Daily Word</strong>
+          <span id="resultNextDaily">Not active</span>
         </div>
       </div>
       <div class="modal-actions">
@@ -1372,6 +1521,34 @@
             <span>Switch the custom keyboard from alphabetical order to a QWERTY layout.</span>
           </div>
           <input id="qwertyToggle" class="toggle" type="checkbox">
+        </label>
+        <label class="setting-item">
+          <div>
+            <strong>Desktop On-Screen Keyboard</strong>
+            <span>Show the custom keyboard on computer too, even when you are not on phone.</span>
+          </div>
+          <input id="desktopKeyboardToggle" class="toggle" type="checkbox">
+        </label>
+        <label class="setting-item">
+          <div>
+            <strong>High Contrast Guides</strong>
+            <span>Make the graph guide lines stand out more so the chart is easier to read.</span>
+          </div>
+          <input id="highContrastToggle" class="toggle" type="checkbox">
+        </label>
+        <label class="setting-item">
+          <div>
+            <strong>Show All Guess Lines</strong>
+            <span>Keep every guess line bright on the graph instead of only spotlighting a few at once.</span>
+          </div>
+          <input id="showAllLinesToggle" class="toggle" type="checkbox">
+        </label>
+        <label class="setting-item">
+          <div>
+            <strong>Reduced Motion</strong>
+            <span>Lower the amount of animation and make reveals feel quicker and calmer.</span>
+          </div>
+          <input id="reducedMotionToggle" class="toggle" type="checkbox">
         </label>
       </div>
       <div class="modal-actions">
@@ -1425,6 +1602,9 @@
     const resultOverlay = document.getElementById("resultOverlay");
     const resultTitle = document.getElementById("resultTitle");
     const resultText = document.getElementById("resultText");
+    const dailyHero = document.getElementById("dailyHero");
+    const dailyHeroLabel = document.getElementById("dailyHeroLabel");
+    const dailyHeroCountdown = document.getElementById("dailyHeroCountdown");
     const resultWord = document.getElementById("resultWord");
     const resultGraph = document.getElementById("resultGraph");
     const resultCaption = document.getElementById("resultCaption");
@@ -1432,12 +1612,17 @@
     const resultMode = document.getElementById("resultMode");
     const resultMatches = document.getElementById("resultMatches");
     const resultLastGuess = document.getElementById("resultLastGuess");
+    const resultNextDaily = document.getElementById("resultNextDaily");
     const playAgainButton = document.getElementById("playAgain");
     const settingsOverlay = document.getElementById("settingsOverlay");
     const closeSettingsButton = document.getElementById("closeSettings");
     const lightModeToggle = document.getElementById("lightModeToggle");
     const easyModeToggle = document.getElementById("easyModeToggle");
     const qwertyToggle = document.getElementById("qwertyToggle");
+    const desktopKeyboardToggle = document.getElementById("desktopKeyboardToggle");
+    const highContrastToggle = document.getElementById("highContrastToggle");
+    const showAllLinesToggle = document.getElementById("showAllLinesToggle");
+    const reducedMotionToggle = document.getElementById("reducedMotionToggle");
     const confirmOverlay = document.getElementById("confirmOverlay");
     const confirmTitle = document.getElementById("confirmTitle");
     const confirmCopy = document.getElementById("confirmCopy");
@@ -1453,6 +1638,10 @@
     const GRID_LINES = 5;
     const MAX_GUESSES = 6;
     const MAX_ACTIVE_LINES = 3;
+    const DAILY_TIME_ZONE = "America/New_York";
+    const DAILY_POOL_SIZE = 500;
+    const DAILY_EPOCH = { year: 2026, month: 4, day: 28 };
+    const DAILY_STORAGE_PREFIX = "curvele-daily-";
     const GUESS_COLORS = [
       { label: "Guess 1", color: "#89cbff", note: "blue" },
       { label: "Guess 2", color: "#ff8d98", note: "red" },
@@ -1506,10 +1695,15 @@
       lightMode: false,
       easyMode: false,
       keyboardLayout: "qwerty",
+      desktopKeyboard: false,
+      highContrastGuides: false,
+      showAllGuessLines: false,
+      reducedMotion: false,
       isTouchDevice: window.matchMedia("(pointer: coarse)").matches,
       playerName: "",
       previewNeedsResetWarning: true,
       pendingResetAfterResult: false,
+      pendingResetTargetMode: "unlimited",
       pendingPreviewValue: "",
       pendingConfirmAction: null,
       resultTimer: null,
@@ -1519,6 +1713,14 @@
       brandTimer: null,
       bryceCount: 0,
       answerHackVisible: false,
+      mode: "daily",
+      currentDailyKey: "",
+      dailyCompletedKey: "",
+      nextDailyTimer: null,
+      resultShowsDailyCountdown: false,
+      newWordCooldownTimer: null,
+      newWordCooldownActive: false,
+      newWordCooldownRemaining: 0,
       allowedWords: new Set(ALLOWED_WORDS),
       fullAllowedWords: new Set(ALLOWED_WORDS),
       answers: [...ANSWER_WORDS]
@@ -1526,6 +1728,132 @@
 
     function sanitizeWord(raw) {
       return raw.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 5);
+    }
+
+    function seededRandom(seed) {
+      let value = seed >>> 0;
+      return () => {
+        value = (value + 0x6D2B79F5) >>> 0;
+        let t = Math.imul(value ^ (value >>> 15), 1 | value);
+        t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function buildDailyPool(words) {
+      const uniqueWords = [...new Set(words.filter((word) => word !== EASTER_WORD))];
+      const startIndex = Math.max(0, Math.floor(uniqueWords.length * 0.28));
+      const harderWords = uniqueWords.slice(startIndex);
+      const poolSource = harderWords.length >= DAILY_POOL_SIZE ? harderWords : uniqueWords;
+      const shuffled = [...poolSource];
+      const rand = seededRandom(947521);
+      for (let i = shuffled.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(rand() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled.slice(0, Math.min(DAILY_POOL_SIZE, shuffled.length));
+    }
+
+    function getEasternParts(date = new Date()) {
+      const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: DAILY_TIME_ZONE,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hourCycle: "h23"
+      });
+      const parts = Object.fromEntries(
+        formatter
+          .formatToParts(date)
+          .filter((part) => part.type !== "literal")
+          .map((part) => [part.type, part.value])
+      );
+      return {
+        year: Number(parts.year),
+        month: Number(parts.month),
+        day: Number(parts.day),
+        hour: Number(parts.hour),
+        minute: Number(parts.minute),
+        second: Number(parts.second)
+      };
+    }
+
+    function getCurrentDailyKey(date = new Date()) {
+      const parts = getEasternParts(date);
+      return `${parts.year}-${String(parts.month).padStart(2, "0")}-${String(parts.day).padStart(2, "0")}`;
+    }
+
+    function getDailyStorageKey(date = new Date()) {
+      return `${DAILY_STORAGE_PREFIX}${getCurrentDailyKey(date)}`;
+    }
+
+    function readDailyCompletion(date = new Date()) {
+      try {
+        const saved = localStorage.getItem(getDailyStorageKey(date));
+        return saved ? JSON.parse(saved) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function hasCompletedDaily(date = new Date()) {
+      return Boolean(readDailyCompletion(date));
+    }
+
+    function markDailyCompleted(win) {
+      const key = getCurrentDailyKey();
+      state.dailyCompletedKey = key;
+      try {
+        localStorage.setItem(`${DAILY_STORAGE_PREFIX}${key}`, JSON.stringify({
+          key,
+          win,
+          tries: state.guesses.length,
+          completedAt: new Date().toISOString()
+        }));
+      } catch {
+        // Ignore storage issues and keep the session state in memory.
+      }
+    }
+
+    function getDailyIndex(date = new Date()) {
+      const parts = getEasternParts(date);
+      const currentUtc = Date.UTC(parts.year, parts.month - 1, parts.day);
+      const epochUtc = Date.UTC(DAILY_EPOCH.year, DAILY_EPOCH.month - 1, DAILY_EPOCH.day);
+      return Math.max(0, Math.floor((currentUtc - epochUtc) / 86400000));
+    }
+
+    function getDailyWord(date = new Date()) {
+      const pool = buildDailyPool(ANSWER_WORDS);
+      if (!pool.length) {
+        return ANSWER_WORDS[0] || "READY";
+      }
+      return pool[getDailyIndex(date) % pool.length];
+    }
+
+    function getNextDailyCountdownMs(date = new Date()) {
+      const parts = getEasternParts(date);
+      return (((23 - parts.hour) * 60 + (59 - parts.minute)) * 60 + (60 - parts.second)) * 1000 - date.getMilliseconds();
+    }
+
+    function formatCountdown(ms) {
+      const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      return `${hours}h ${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(2, "0")}s`;
+    }
+
+    function isTodayDailyCompleted() {
+      const todayKey = getCurrentDailyKey();
+      if (state.dailyCompletedKey === todayKey) {
+        return true;
+      }
+      const completed = hasCompletedDaily();
+      state.dailyCompletedKey = completed ? todayKey : "";
+      return completed;
     }
 
     function toValue(char) {
@@ -1614,13 +1942,16 @@
       const lines = [];
       if (state.easyMode) {
         easyModeMarks().forEach((mark) => {
-          lines.push(`<line x1="${PADDING_X - 4}" y1="${mark.y}" x2="${PADDING_X + 72}" y2="${mark.y}" stroke="var(--grid)" stroke-width="1.2" stroke-dasharray="6 8" />`);
-          lines.push(`<text x="${PADDING_X - 28}" y="${mark.y + 5}" fill="var(--muted)" font-size="14" font-weight="800">${mark.label}</text>`);
+          lines.push(`<line x1="${PADDING_X - 4}" y1="${mark.y}" x2="${PADDING_X + 72}" y2="${mark.y}" stroke="var(--grid)" stroke-width="${state.highContrastGuides ? "2.2" : "1.2"}" stroke-dasharray="6 8" />`);
+          lines.push(`<text x="${PADDING_X - 28}" y="${mark.y + 5}" fill="${state.highContrastGuides ? "var(--ink)" : "var(--muted)"}" font-size="${state.highContrastGuides ? "15" : "14"}" font-weight="800">${mark.label}</text>`);
         });
       } else {
         for (let i = 0; i < GRID_LINES; i += 1) {
           const y = PADDING_Y + (i * (HEIGHT - PADDING_Y * 2)) / (GRID_LINES - 1);
-          lines.push(`<line x1="${PADDING_X}" y1="${y}" x2="${WIDTH - PADDING_X}" y2="${y}" stroke="var(--grid)" stroke-width="1" stroke-dasharray="6 8" />`);
+          lines.push(`<line x1="${PADDING_X}" y1="${y}" x2="${WIDTH - PADDING_X}" y2="${y}" stroke="var(--grid)" stroke-width="${state.highContrastGuides ? "1.8" : "1"}" stroke-dasharray="6 8" />`);
+          if (state.highContrastGuides) {
+            lines.push(`<text x="${PADDING_X - 30}" y="${y + 5}" fill="var(--ink)" font-size="14" font-weight="800">${letterForGridLine(i)}</text>`);
+          }
         }
       }
       return lines.join("");
@@ -1629,7 +1960,7 @@
     function renderGraph() {
       const targetPoints = buildPoints(state.secret);
       const targetPath = pathFromPoints(targetPoints);
-      const activeSet = new Set(state.activeGuessIndices);
+      const activeSet = new Set(state.showAllGuessLines ? state.guesses.map((_, index) => index) : state.activeGuessIndices);
       const matchedPositions = Array(5).fill(false);
       const answerOutline = document.body.classList.contains("light-mode") ? "#1c2a44" : "rgba(0,0,0,0.32)";
       const winningGuess = state.wonLastRound ? state.guesses[state.guesses.length - 1] : null;
@@ -1657,20 +1988,24 @@
         const strokeWidth = active ? 6 : 4;
         const circleOpacity = active ? 0.95 : 0.14;
         const shouldAnimate = index === state.lastAnimatedGuessIndex;
-        const animationStyle = shouldAnimate ? `stroke-dasharray: var(--path-length); stroke-dashoffset: var(--path-length); animation: drawLine 2200ms ease forwards;` : "";
+        const animationStyle = shouldAnimate && !state.reducedMotion ? `stroke-dasharray: var(--path-length); stroke-dashoffset: var(--path-length); animation: drawLine 2200ms ease forwards;` : "";
         return `
           <path d="${path}" fill="none" stroke="${guess.color}" stroke-width="${strokeWidth}" stroke-linecap="round" opacity="${opacity}" pathLength="100" style="--path-length: 100; ${animationStyle}" />
           ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="${active ? 6 : 5}" fill="${guess.color}" fill-opacity="${circleOpacity}" stroke="var(--point-stroke)" stroke-width="2.5" />`).join("")}
         `;
       }).join("");
 
+      const victoryDurations = state.reducedMotion ? [0, 0, 0, 0] : [1150, 920, 760, 620];
+      const victoryDelays = state.reducedMotion ? [0, 0, 0, 0] : [0, 1080, 1940, 2640];
+      const victoryPointDelays = state.reducedMotion ? [0, 0, 0, 0, 0] : [0, 1080, 1940, 2640, 3260];
+
       svg.innerHTML = `
         ${gridMarkup()}
         ${guessMarkup}
         <path d="${targetPath}" fill="none" stroke="${answerOutline}" stroke-width="12" stroke-linecap="round" opacity="${document.body.classList.contains("light-mode") ? "0.34" : "0.22"}" />
         <path d="${targetPath}" fill="none" stroke="${getComputedStyle(document.documentElement).getPropertyValue("--white-line").trim() || "#ffffff"}" stroke-width="8" stroke-linecap="round" />
-        ${winningSegments.map((segment, index) => segment ? `<path d="${segment}" fill="none" stroke="url(#victoryRainbow)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" style="--path-length: 100; stroke-dasharray: var(--path-length); stroke-dashoffset: var(--path-length); animation: drawLineVictory ${[1150, 920, 760, 620][index]}ms cubic-bezier(.18,.08,.2,1) ${[0, 1080, 1940, 2640][index]}ms forwards;" />` : "" ).join("")}
-        ${winningPoints.map((point, index) => winningSegments.length ? `<circle cx="${point.x}" cy="${point.y}" r="7" fill="#ffffff" style="opacity: 0; animation: drawLineVictory 260ms ease ${[0, 1080, 1940, 2640, 3260][index]}ms forwards, rainbowFlash 1200ms linear ${[0, 1080, 1940, 2640, 3260][index]}ms infinite;" stroke="var(--point-stroke)" stroke-width="3" />` : "").join("")}
+        ${winningSegments.map((segment, index) => segment ? `<path d="${segment}" fill="none" stroke="url(#victoryRainbow)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" style="--path-length: 100; ${state.reducedMotion ? "opacity: 1;" : `stroke-dasharray: var(--path-length); stroke-dashoffset: var(--path-length); animation: drawLineVictory ${victoryDurations[index]}ms cubic-bezier(.18,.08,.2,1) ${victoryDelays[index]}ms forwards;`}" />` : "" ).join("")}
+        ${winningPoints.map((point, index) => winningSegments.length ? `<circle cx="${point.x}" cy="${point.y}" r="7" fill="#ffffff" style="${state.reducedMotion ? "opacity: 1;" : `opacity: 0; animation: drawLineVictory 260ms ease ${victoryPointDelays[index]}ms forwards, rainbowFlash 1200ms linear ${victoryPointDelays[index]}ms infinite;`}" stroke="var(--point-stroke)" stroke-width="3" />` : "").join("")}
         ${targetPoints.map((point, index) => `<circle cx="${point.x}" cy="${point.y}" r="7" fill="${matchedPositions[index] ? "#6aaa64" : "#ffffff"}" stroke="var(--point-stroke)" stroke-width="3" />`).join("")}
         <defs>
           <linearGradient id="victoryRainbow" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -1693,7 +2028,7 @@
         const preview = activeRow ? sanitizeWord(input.value) : "";
         const cells = [];
         const exists = i < state.guesses.length;
-        const active = state.activeGuessIndices.includes(i);
+        const active = state.showAllGuessLines ? exists : state.activeGuessIndices.includes(i);
 
         for (let j = 0; j < 5; j += 1) {
           const char = guess ? guess.word[j] : (preview[j] || "");
@@ -1711,7 +2046,7 @@
           <div class="guess-line">
             <button class="selector-chip ${exists ? (active ? "active" : "inactive") : "pending"} guess-${i}" data-index="${i}" type="button">
               <strong>Guess ${i + 1}</strong>
-              <span>${exists ? (active ? "tap to hide" : "tap to show") : (activeRow ? "tap row to type" : "waiting")}</span>
+              <span>${exists ? (state.showAllGuessLines ? "all shown" : (active ? "tap to hide" : "tap to show")) : (activeRow ? "tap row to type" : "waiting")}</span>
             </button>
             <div class="guess-row" data-guess-row="${i}">${cells.join("")}</div>
           </div>
@@ -1723,6 +2058,9 @@
           event.stopPropagation();
           const index = Number(button.dataset.index);
           if (index < state.guesses.length) {
+            if (state.showAllGuessLines) {
+              return;
+            }
             activateGuess(index);
           } else if (index === state.guesses.length && !state.isOver) {
             input.focus();
@@ -1739,7 +2077,7 @@
     }
 
     function setStatus(message) {
-      status.textContent = "You have six tries to guess the five-letter word using the charts.";
+      renderModeStatus();
     }
 
     function setHint(message) {
@@ -1754,6 +2092,87 @@
       setTimeout(() => {
         toast.remove();
       }, 2300);
+    }
+
+    function renderModeStatus() {
+      if (state.mode === "daily") {
+        status.textContent = "You are doing the daily word.";
+        return;
+      }
+      status.textContent = isTodayDailyCompleted()
+        ? `Today's daily is complete. Next daily word in ${formatCountdown(getNextDailyCountdownMs())}.`
+        : "Unlimited mode is on. Tap New Word anytime for another round.";
+    }
+
+    function renderNewWordButton() {
+      const label = state.mode === "daily" ? "Unlimited" : "New Word";
+      if (state.newWordCooldownActive) {
+        newGameButton.disabled = true;
+        newGameButton.classList.add("cooldown");
+        newGameButton.innerHTML = `<span>${label}</span>`;
+        return;
+      }
+      newGameButton.disabled = false;
+      newGameButton.classList.remove("cooldown");
+      newGameButton.style.removeProperty("--cooldown-scale");
+      newGameButton.innerHTML = `<span>${label}</span>`;
+    }
+
+    function stopDailyCountdown() {
+      if (state.nextDailyTimer) {
+        clearInterval(state.nextDailyTimer);
+        state.nextDailyTimer = null;
+      }
+    }
+
+    function updateDailyCountdownText() {
+      const countdown = formatCountdown(getNextDailyCountdownMs());
+      resultNextDaily.textContent = countdown;
+      dailyHeroCountdown.textContent = countdown;
+      if (state.mode === "daily" && state.resultShowsDailyCountdown && !resultOverlay.hidden) {
+        resultText.textContent = `Next daily word in ${countdown}.`;
+      }
+      const newKey = getCurrentDailyKey();
+      if (state.currentDailyKey && newKey !== state.currentDailyKey) {
+        state.dailyCompletedKey = "";
+        stopDailyCountdown();
+        resetGame("daily");
+        return;
+      }
+      renderModeStatus();
+    }
+
+    function startDailyCountdown() {
+      stopDailyCountdown();
+      updateDailyCountdownText();
+      state.nextDailyTimer = setInterval(updateDailyCountdownText, 1000);
+    }
+
+    function renderDailyHero() {
+      if (isTodayDailyCompleted()) {
+        dailyHero.hidden = false;
+        dailyHeroLabel.textContent = "Next Daily Word In";
+        dailyHeroCountdown.textContent = formatCountdown(getNextDailyCountdownMs());
+      } else {
+        dailyHero.hidden = true;
+      }
+    }
+
+    function startNewWordCooldown() {
+      if (state.newWordCooldownTimer || state.newWordCooldownActive) return;
+      state.newWordCooldownActive = true;
+      renderNewWordButton();
+      newGameButton.style.setProperty("--cooldown-scale", "1");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          newGameButton.style.setProperty("--cooldown-scale", "0");
+        });
+      });
+      state.newWordCooldownTimer = setTimeout(() => {
+        state.newWordCooldownTimer = null;
+        state.newWordCooldownActive = false;
+        renderNewWordButton();
+      }, 5000);
     }
 
     function showVictoryBanner() {
@@ -1832,8 +2251,9 @@
     }
 
     function renderKeyboard() {
-      keyboard.hidden = !state.isTouchDevice;
-      if (!state.isTouchDevice) return;
+      const shouldShowKeyboard = state.isTouchDevice || state.desktopKeyboard;
+      keyboard.hidden = !shouldShowKeyboard;
+      if (!shouldShowKeyboard) return;
       const rows = KEYBOARD_LAYOUTS[state.keyboardLayout].map((row) => `
         <div class="keyboard-row">
           ${row.map((key) => `<button class="key-btn ${key === "ENTER" || key === "BACK" ? "wide" : ""}" data-key="${key}" type="button">${key === "BACK" ? "⌫" : key}</button>`).join("")}
@@ -1841,26 +2261,35 @@
       `).join("");
       keyboard.innerHTML = rows;
       keyboard.querySelectorAll("[data-key]").forEach((button) => {
+        button.addEventListener("mousedown", (event) => {
+          event.preventDefault();
+        });
         button.addEventListener("click", () => {
           const key = button.dataset.key;
           if (key === "ENTER") {
             submitGuess();
+            input.focus();
             return;
           }
           if (key === "BACK") {
             input.value = input.value.slice(0, -1);
             renderBoard();
+            input.focus();
             return;
           }
           if (input.value.length < 5) {
             input.value = `${input.value}${key}`;
             renderBoard();
           }
+          input.focus();
         });
       });
     }
 
-    function randomWord() {
+    function randomWord(mode = state.mode) {
+      if (mode === "daily") {
+        return getDailyWord();
+      }
       return state.answers[Math.floor(Math.random() * state.answers.length)];
     }
 
@@ -1875,6 +2304,7 @@
 
     function activateGuess(index) {
       if (index >= state.guesses.length) return;
+      if (state.showAllGuessLines) return;
       const existingIndex = state.activeGuessIndices.indexOf(index);
       if (existingIndex !== -1) {
         state.activeGuessIndices.splice(existingIndex, 1);
@@ -1952,38 +2382,59 @@
       }
       const latestGuess = state.guesses[state.guesses.length - 1];
       const exactMatches = latestGuess ? countExactMatches(latestGuess.word, state.secret) : 0;
+      state.resultShowsDailyCountdown = isTodayDailyCompleted();
       resultTitle.textContent = mode === "reset" ? "Round Reset" : (win ? "You Solved It" : "Round Over");
       resultText.textContent = mode === "reset"
-        ? "You started a new round before finishing this one. Here is the final look at the previous answer and your latest guess."
+        ? `You started a ${state.pendingResetTargetMode === "unlimited" ? "new unlimited round" : "new round"} before finishing this one. Here is the final look at the previous answer and your latest guess.`
+        : isTodayDailyCompleted()
+        ? `Next daily word in ${formatCountdown(getNextDailyCountdownMs())}.`
         : win
         ? `Nice work${state.playerName ? `, ${state.playerName}` : ""}. Your final guess matched the hidden curve and spelled the correct word.`
         : `${state.playerName ? `${state.playerName}, ` : ""}you used all six tries before landing on the correct word.`;
       resultWord.textContent = `The word was ${state.secret}.`;
       resultTries.textContent = `${state.guesses.length} of ${MAX_GUESSES}`;
-      resultMode.textContent = win ? "Win" : "Loss";
+      resultMode.textContent = mode === "reset"
+        ? `${state.mode === "daily" ? "Daily" : "Unlimited"} Reset`
+        : `${state.mode === "daily" ? "Daily" : "Unlimited"} ${win ? "Win" : "Loss"}`;
       resultMatches.textContent = `${exactMatches} of 5 points matched on your last guess`;
       resultLastGuess.textContent = latestGuess ? latestGuess.word : "No final guess";
+      resultNextDaily.textContent = formatCountdown(getNextDailyCountdownMs());
       resultCaption.textContent = latestGuess
         ? `The white line is the answer. The colored line shows your final guess, and any green points mark exact position matches.`
         : `The white line is the answer graph for this round.`;
+      playAgainButton.textContent = state.mode === "daily" ? "Play Unlimited" : "Play Again";
+      renderDailyHero();
       renderResultGraph();
       resultOverlay.hidden = false;
+      if (isTodayDailyCompleted() || state.mode === "daily") {
+        startDailyCountdown();
+      } else {
+        stopDailyCountdown();
+      }
     }
 
     function applySettings() {
       document.body.classList.toggle("light-mode", state.lightMode);
+      document.body.classList.toggle("high-contrast-guides", state.highContrastGuides);
+      document.body.classList.toggle("desktop-keyboard", state.desktopKeyboard && !state.isTouchDevice);
       state.answers = [...ANSWER_WORDS];
       state.answers = state.answers.filter((word) => word !== EASTER_WORD);
       state.allowedWords = new Set(state.fullAllowedWords);
       lightModeToggle.checked = state.lightMode;
       easyModeToggle.checked = state.easyMode;
       qwertyToggle.checked = state.keyboardLayout === "qwerty";
+      desktopKeyboardToggle.checked = state.desktopKeyboard;
+      highContrastToggle.checked = state.highContrastGuides;
+      showAllLinesToggle.checked = state.showAllGuessLines;
+      reducedMotionToggle.checked = state.reducedMotion;
       renderGraph();
       renderBoard();
       renderKeyboard();
+      renderModeStatus();
+      renderNewWordButton();
     }
 
-    function resetGame() {
+    function resetGame(mode = state.mode) {
       if (state.resultTimer) {
         clearTimeout(state.resultTimer);
         state.resultTimer = null;
@@ -2002,9 +2453,13 @@
       state.scareCooldown = false;
       state.wonLastRound = false;
       state.answerHackVisible = false;
-      state.secret = randomWord();
+      state.mode = mode;
+      state.currentDailyKey = getCurrentDailyKey();
+      state.dailyCompletedKey = isTodayDailyCompleted() ? state.currentDailyKey : "";
+      state.secret = randomWord(mode);
       state.guesses = [];
       state.isOver = false;
+      state.resultShowsDailyCountdown = false;
       state.activeGuessIndices = [];
       state.lastAnimatedGuessIndex = -1;
       state.previewNeedsResetWarning = true;
@@ -2013,7 +2468,13 @@
       renderGraph();
       renderBoard();
       renderKeyboard();
-      setStatus("You have 6 tries to guess the five-letter word.");
+      renderModeStatus();
+      renderNewWordButton();
+      if (state.mode === "daily" || isTodayDailyCompleted()) {
+        startDailyCountdown();
+      } else {
+        stopDailyCountdown();
+      }
       setHint(state.easyMode
         ? "Easy mode is on, so the graph shows the middle guide letter. You can still guess any real five-letter word."
         : "Tap the current row to type a real five-letter word, then compare your colored line to the white answer line.");
@@ -2027,14 +2488,16 @@
       state.wonLastRound = win;
       if (win) {
         renderGraph();
-        showVictoryBanner();
+        if (!state.reducedMotion) {
+          showVictoryBanner();
+        }
       } else {
         showToast("Round over");
       }
       state.resultTimer = setTimeout(() => {
         state.resultTimer = null;
         showResult(win);
-      }, win ? 4100 : 2400);
+      }, state.reducedMotion ? (win ? 1000 : 900) : (win ? 4100 : 2400));
     }
 
     function submitGuess() {
@@ -2103,6 +2566,9 @@
       renderBoard();
 
       if (state.isOver) {
+        if (state.mode === "daily") {
+          markDailyCompleted(guess === state.secret);
+        }
         queueRoundResult(guess === state.secret);
       } else {
         input.focus();
@@ -2138,17 +2604,18 @@
     });
 
     boardShell.addEventListener("click", () => {
-      if (!state.isOver && !state.isTouchDevice) {
+      if (!state.isOver && (!state.isTouchDevice || state.desktopKeyboard)) {
         input.focus();
       }
     });
     newGameButton.addEventListener("click", () => {
-      if (state.guesses.length > 0) {
-        state.pendingResetAfterResult = true;
-        showResult(state.guesses[state.guesses.length - 1]?.word === state.secret, "reset");
-      } else {
-        resetGame();
+      if (state.newWordCooldownActive) {
+        return;
       }
+      state.pendingResetAfterResult = false;
+      state.pendingResetTargetMode = "unlimited";
+      resetGame("unlimited");
+      startNewWordCooldown();
     });
     settingsButton.addEventListener("click", () => {
       settingsOverlay.hidden = false;
@@ -2164,6 +2631,12 @@
     startPlayButton.addEventListener("click", () => {
       startOverlay.hidden = true;
       rulesOverlay.hidden = true;
+      if (isTodayDailyCompleted()) {
+        resetGame("unlimited");
+        showToast("Today's daily is already complete");
+      } else {
+        resetGame("daily");
+      }
       input.focus();
     });
     startTutorialButton.addEventListener("click", () => {
@@ -2199,7 +2672,8 @@
     });
     playAgainButton.addEventListener("click", () => {
       state.pendingResetAfterResult = false;
-      resetGame();
+      const targetMode = state.mode === "daily" ? "unlimited" : state.mode;
+      resetGame(targetMode);
     });
     closeSettingsButton.addEventListener("click", () => {
       settingsOverlay.hidden = true;
@@ -2232,6 +2706,23 @@
       state.keyboardLayout = event.target.checked ? "qwerty" : "abc";
       renderKeyboard();
     });
+    desktopKeyboardToggle.addEventListener("change", (event) => {
+      state.desktopKeyboard = event.target.checked;
+      renderKeyboard();
+    });
+    highContrastToggle.addEventListener("change", (event) => {
+      state.highContrastGuides = event.target.checked;
+      applySettings();
+    });
+    showAllLinesToggle.addEventListener("change", (event) => {
+      state.showAllGuessLines = event.target.checked;
+      renderGraph();
+      renderBoard();
+    });
+    reducedMotionToggle.addEventListener("change", (event) => {
+      state.reducedMotion = event.target.checked;
+      renderGraph();
+    });
     document.addEventListener("keydown", (event) => {
       if (startOverlay.hidden && rulesOverlay.hidden && settingsOverlay.hidden && resultOverlay.hidden && !state.isOver) {
         const isTypingKey = event.key.length === 1 || event.key === "Backspace";
@@ -2244,8 +2735,9 @@
     if (state.isTouchDevice) {
       input.readOnly = true;
     }
+    state.dailyCompletedKey = hasCompletedDaily() ? getCurrentDailyKey() : "";
     applySettings();
-    resetGame();
+    resetGame(state.dailyCompletedKey ? "unlimited" : "daily");
     renderSignatureGraph();
   </script>
 </body>
