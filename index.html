@@ -699,11 +699,12 @@
       width: 54px;
       height: 32px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.16);
-      border: 1px solid rgba(143,162,198,0.22);
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.08));
+      border: 1px solid rgba(143,162,198,0.28);
       position: relative;
       cursor: pointer;
-      transition: background 140ms ease;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), inset 0 -2px 6px rgba(0,0,0,0.24);
+      transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
     }
 
     .toggle::after {
@@ -714,12 +715,15 @@
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      background: #fff;
-      transition: transform 140ms ease;
+      background: linear-gradient(180deg, #ffffff, #dfe8ff);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+      transition: transform 140ms ease, background 140ms ease;
     }
 
     .toggle:checked {
-      background: rgba(117, 162, 255, 0.55);
+      background: linear-gradient(180deg, rgba(117, 162, 255, 0.72), rgba(90, 134, 232, 0.62));
+      border-color: rgba(142, 199, 255, 0.5);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.08), 0 0 0 1px rgba(142, 199, 255, 0.18);
     }
 
     .toggle:checked::after {
@@ -1135,6 +1139,26 @@
       margin: 0;
       color: var(--muted);
       line-height: 1.5;
+    }
+
+    .custom-note.recommended {
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .custom-note.caution {
+      color: var(--orange);
+      font-weight: 800;
+    }
+
+    .manual-link-box {
+      margin-top: 10px;
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(143, 162, 198, 0.22);
+      background: rgba(255,255,255,0.06);
+      color: var(--ink);
+      padding: 12px 14px;
     }
 
     .mode-pill {
@@ -1562,8 +1586,8 @@
             <line x1="36" y1="24" x2="596" y2="24" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
             <line x1="36" y1="110" x2="596" y2="110" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
             <line x1="36" y1="196" x2="596" y2="196" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
-            <text x="10" y="30" fill="#c7c7cb" font-size="14" font-weight="700">Z</text>
-            <text x="12" y="196" fill="#c7c7cb" font-size="14" font-weight="700">A</text>
+            <text x="8" y="32" fill="#c7c7cb" font-size="18" font-weight="800">Z</text>
+            <text x="10" y="196" fill="#c7c7cb" font-size="18" font-weight="800">A</text>
             <path d="M 60 82 C 130 82, 130 168, 200 168 C 270 168, 270 196, 340 196 C 410 196, 410 175, 480 175 C 545 175, 545 30, 580 30" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
             <circle cx="60" cy="82" r="6" fill="#ffffff" stroke="#1f2d47" stroke-width="2.5" />
             <circle cx="200" cy="168" r="6" fill="#ffffff" stroke="#1f2d47" stroke-width="2.5" />
@@ -1755,7 +1779,6 @@
         </label>
       </div>
       <div class="modal-actions">
-        <button id="openCustomFromSettings" class="action-btn" type="button">Custom Challenge</button>
         <button id="closeSettings" class="action-btn" type="button">Done</button>
       </div>
     </div>
@@ -1793,6 +1816,10 @@
           <input id="customWordInput" class="custom-input" type="text" maxlength="12" placeholder="Type 3 to 12 letters">
         </label>
         <p id="customWordNote" class="custom-note">Custom games can use any 3 to 12 letter alphabetic answer. Shared custom puzzles keep the same answer for everyone with that link.</p>
+        <div id="manualCopyWrap" class="custom-field" hidden>
+          <strong>Copy That Link</strong>
+          <input id="manualCopyLink" class="manual-link-box" type="text" readonly>
+        </div>
       </div>
       <div class="modal-actions">
         <button id="copyCustomLink" class="action-btn" type="button">Copy Link</button>
@@ -1893,7 +1920,6 @@
     const showAllLinesToggle = document.getElementById("showAllLinesToggle");
     const reducedMotionToggle = document.getElementById("reducedMotionToggle");
     const hardModeToggle = document.getElementById("hardModeToggle");
-    const openCustomFromSettings = document.getElementById("openCustomFromSettings");
     const statsOverlay = document.getElementById("statsOverlay");
     const closeStatsButton = document.getElementById("closeStats");
     const statsPlayed = document.getElementById("statsPlayed");
@@ -1906,6 +1932,8 @@
     const customOverlay = document.getElementById("customOverlay");
     const customWordInput = document.getElementById("customWordInput");
     const customWordNote = document.getElementById("customWordNote");
+    const manualCopyWrap = document.getElementById("manualCopyWrap");
+    const manualCopyLink = document.getElementById("manualCopyLink");
     const copyCustomLinkButton = document.getElementById("copyCustomLink");
     const playCustomNowButton = document.getElementById("playCustomNow");
     const closeCustomButton = document.getElementById("closeCustom");
@@ -2343,11 +2371,11 @@
         return victoryDelays[Math.max(0, index - 1)] + victoryDurations[Math.max(0, index - 1)] - 60;
       });
 
-      const axisFont = state.isTouchDevice ? 18 : 14;
+      const axisFont = state.isTouchDevice ? 24 : 18;
       svg.innerHTML = `
         ${gridMarkup()}
-        <text x="${PADDING_X - 28}" y="${PADDING_Y + 7}" fill="var(--muted)" font-size="${axisFont}" font-weight="900">Z</text>
-        <text x="${PADDING_X - 28}" y="${HEIGHT - PADDING_Y + 7}" fill="var(--muted)" font-size="${axisFont}" font-weight="900">A</text>
+        <text x="${PADDING_X - 34}" y="${PADDING_Y + 9}" fill="var(--muted)" font-size="${axisFont}" font-weight="900">Z</text>
+        <text x="${PADDING_X - 34}" y="${HEIGHT - PADDING_Y + 9}" fill="var(--muted)" font-size="${axisFont}" font-weight="900">A</text>
         ${guessMarkup}
         <path d="${targetPath}" fill="none" stroke="${answerOutline}" stroke-width="12" stroke-linecap="round" opacity="${document.body.classList.contains("light-mode") ? "0.34" : "0.22"}" />
         <path d="${targetPath}" fill="none" stroke="${getComputedStyle(document.documentElement).getPropertyValue("--white-line").trim() || "#ffffff"}" stroke-width="8" stroke-linecap="round" />
@@ -2442,7 +2470,7 @@
       statsButton.hidden = lockUi;
       summaryButton.hidden = lockUi ? true : !(state.isOver && resultOverlay.hidden);
       settingsButton.hidden = lockUi;
-      newGameButton.hidden = lockUi;
+      newGameButton.hidden = lockUi || state.mode === "custom";
     }
 
     function showToast(message, className = "") {
@@ -2470,7 +2498,7 @@
     }
 
     function renderNewWordButton() {
-      const label = state.mode === "daily" ? "Unlimited" : state.mode === "custom" ? "Random 5-Letter" : "New Word";
+      const label = state.mode === "daily" ? "Unlimited" : "New Word";
       if (state.newWordCooldownActive) {
         newGameButton.disabled = true;
         newGameButton.classList.add("cooldown");
@@ -2901,8 +2929,8 @@
         <line x1="34" y1="24" x2="586" y2="24" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
         <line x1="34" y1="110" x2="586" y2="110" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
         <line x1="34" y1="196" x2="586" y2="196" stroke="rgba(255,255,255,0.1)" stroke-dasharray="5 8" />
-        <text x="8" y="30" fill="var(--muted)" font-size="14" font-weight="700">Z</text>
-        <text x="10" y="196" fill="var(--muted)" font-size="14" font-weight="700">A</text>
+            <text x="6" y="32" fill="var(--muted)" font-size="18" font-weight="800">Z</text>
+            <text x="8" y="196" fill="var(--muted)" font-size="18" font-weight="800">A</text>
         ${latestGuessPath ? `<path d="${latestGuessPath}" fill="none" stroke="${latestGuess.color}" stroke-width="5" stroke-linecap="round" opacity="0.8" />` : ""}
         <path d="${answerPath}" fill="none" stroke="${answerOutline}" stroke-width="11" stroke-linecap="round" opacity="${document.body.classList.contains("light-mode") ? "0.34" : "0.22"}" />
         <path d="${answerPath}" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" />
@@ -3305,16 +3333,13 @@
       settingsOverlay.hidden = true;
       input.focus();
     });
-    openCustomFromSettings.addEventListener("click", () => {
-      customOverlay.hidden = false;
-      customWordInput.focus();
-    });
     closeStatsButton.addEventListener("click", () => {
       statsOverlay.hidden = true;
       input.focus();
     });
     closeCustomButton.addEventListener("click", () => {
       customOverlay.hidden = true;
+      manualCopyWrap.hidden = true;
       input.focus();
     });
     confirmCancel.addEventListener("click", () => {
@@ -3366,9 +3391,33 @@
     customWordInput.addEventListener("input", (event) => {
       const value = event.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, MAX_CUSTOM_WORD_LENGTH);
       event.target.value = value;
-      customWordNote.textContent = value.length >= MIN_CUSTOM_WORD_LENGTH
-        ? `${value.length}-letter custom challenge ready. You can play it here or copy a link for someone else.`
-        : "Custom games can use any 3 to 12 letter alphabetic answer. Shared custom puzzles keep the same answer for everyone with that link.";
+      manualCopyWrap.hidden = true;
+      customWordNote.classList.remove("recommended", "caution");
+      if (value.length >= 5 && value.length <= 7) {
+        customWordNote.textContent = `${value.length} letters: recommended. This size usually feels best to play.`;
+        customWordNote.classList.add("recommended");
+      } else if (value.length >= MIN_CUSTOM_WORD_LENGTH) {
+        customWordNote.textContent = `${value.length} letters: not recommended. It will still work, but 5 to 7 letters usually plays better.`;
+        customWordNote.classList.add("caution");
+      } else {
+        customWordNote.textContent = "Custom games can use any 3 to 12 letter alphabetic answer. Shared custom puzzles keep the same answer for everyone with that link.";
+      }
+    });
+    customWordInput.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") {
+        return;
+      }
+      event.preventDefault();
+      const word = customWordInput.value.toUpperCase().replace(/[^A-Z]/g, "");
+      if (word.length < MIN_CUSTOM_WORD_LENGTH) {
+        showToast("Type at least 3 letters");
+        return;
+      }
+      manualCopyLink.value = `${getBaseShareUrl()}${customHashForWord(word)}`;
+      manualCopyWrap.hidden = false;
+      manualCopyLink.focus();
+      manualCopyLink.select();
+      showToast("Manual copy link ready");
     });
     playCustomNowButton.addEventListener("click", () => {
       const word = customWordInput.value.toUpperCase().replace(/[^A-Z]/g, "");
@@ -3390,9 +3439,14 @@
       const shareUrl = `${getBaseShareUrl()}${customHashForWord(word)}`;
       try {
         await navigator.clipboard.writeText(shareUrl);
+        manualCopyWrap.hidden = true;
         showToast("Custom link copied");
       } catch {
-        showToast("Could not copy link");
+        manualCopyLink.value = shareUrl;
+        manualCopyWrap.hidden = false;
+        manualCopyLink.focus();
+        manualCopyLink.select();
+        showToast("Could not copy link. Manual copy appearing.");
       }
     });
     document.addEventListener("keydown", (event) => {
