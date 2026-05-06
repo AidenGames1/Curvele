@@ -90,16 +90,15 @@
     }
 
     .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 0 18px;
+      display: grid;
+      gap: 10px;
+      padding: 10px 0 12px;
       border-bottom: 1px solid rgba(141, 160, 198, 0.16);
     }
 
     .title-wrap {
       text-align: center;
+      margin-bottom: 2px;
     }
 
     .eyebrow {
@@ -122,8 +121,9 @@
 
     .top-actions {
       display: flex;
-      align-items: center;
       gap: 10px;
+      align-items: stretch;
+      width: 100%;
     }
 
     .icon-btn,
@@ -139,6 +139,21 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       transition: transform 120ms ease, filter 120ms ease;
       touch-action: manipulation;
+    }
+
+    .top-actions > .icon-btn {
+      flex: 1 1 0;
+      min-width: 0;
+      width: 100%;
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-inline: 8px;
+      text-align: center;
+      line-height: 1.15;
+      white-space: normal;
+      overflow-wrap: anywhere;
     }
 
     .icon-btn > span,
@@ -208,9 +223,9 @@
     .board-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       gap: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       position: relative;
       z-index: 1;
     }
@@ -223,13 +238,7 @@
     }
 
     .board-copy {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.93rem;
-    }
-
-    .board-copy strong {
-      color: var(--ink);
+      display: none;
     }
 
     .hidden-input {
@@ -322,11 +331,7 @@
     }
 
     .hint-row {
-      color: var(--muted);
-      font-size: 0.96rem;
-      text-align: center;
-      min-height: 22px;
-      margin-top: 10px;
+      display: none;
     }
 
     .selector-chip {
@@ -350,7 +355,7 @@
 
     .guess-line {
       display: grid;
-      grid-template-columns: 124px minmax(320px, 1fr);
+      grid-template-columns: 102px minmax(320px, 1fr);
       gap: 10px;
       align-items: center;
       min-width: 0;
@@ -361,13 +366,21 @@
       color: var(--muted);
       cursor: pointer;
       min-height: 72px;
-      white-space: nowrap;
-      width: 124px;
+      width: 102px;
+      white-space: normal;
+      word-break: break-word;
+      overflow: hidden;
+      line-height: 1.15;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 
     .selector-chip strong,
     .selector-chip span {
       display: block;
+      max-width: 100%;
     }
 
     .selector-chip strong {
@@ -376,7 +389,7 @@
     }
 
     .selector-chip span {
-      font-size: 0.72rem;
+      font-size: 0.66rem;
       opacity: 0.86;
       font-weight: 700;
     }
@@ -388,7 +401,8 @@
     }
 
     .selector-chip.inactive {
-      opacity: 0.62;
+      filter: brightness(0.72) saturate(0.88);
+      box-shadow: inset 0 0 0 999px rgba(7, 10, 22, 0.16);
     }
 
     .selector-chip.pending {
@@ -1209,6 +1223,42 @@
       }
     }
 
+    @keyframes toggleLineIn {
+      0% {
+        opacity: 0.12;
+      }
+      100% {
+        opacity: 0.96;
+      }
+    }
+
+    @keyframes toggleLineOut {
+      0% {
+        opacity: 0.96;
+      }
+      100% {
+        opacity: 0.16;
+      }
+    }
+
+    @keyframes togglePointIn {
+      0% {
+        opacity: 0.14;
+      }
+      100% {
+        opacity: 0.95;
+      }
+    }
+
+    @keyframes togglePointOut {
+      0% {
+        opacity: 0.95;
+      }
+      100% {
+        opacity: 0.14;
+      }
+    }
+
     @keyframes toastInOut {
       0% {
         opacity: 0;
@@ -1257,36 +1307,28 @@
 
     @media (max-width: 640px) {
       .shell {
-        padding: 10px;
+        padding: 10px 8px;
+      }
+
+      .game {
+        width: 100%;
       }
 
       .topbar {
         display: grid;
-        grid-template-columns: 1fr auto;
-        grid-template-areas:
-          "title title"
-          "rules actions";
-        align-items: start;
-        gap: 10px 8px;
+        gap: 8px;
         padding: 10px 0 14px;
       }
 
-      #helpButton {
-        grid-area: rules;
-        justify-self: start;
-      }
-
       .top-actions {
-        grid-area: actions;
-        justify-content: flex-end;
-        justify-self: end;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(0, 1fr);
         gap: 6px;
-        flex-wrap: wrap;
-        max-width: min(100%, 232px);
+        width: 100%;
       }
 
       .title-wrap {
-        grid-area: title;
         min-width: 0;
         width: 100%;
         text-align: center;
@@ -1322,12 +1364,6 @@
         padding: 12px;
       }
 
-      .board-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-
       .board-copy,
       .hint-row,
       .status {
@@ -1335,23 +1371,34 @@
       }
 
       .guess-line {
-        grid-template-columns: 64px minmax(0, 1fr);
+        grid-template-columns: 70px minmax(0, 1fr);
         gap: 8px;
       }
 
+      .top-actions {
+        gap: 8px;
+        width: 100%;
+      }
+
+      .top-actions > .icon-btn {
+        min-height: 52px;
+        padding-inline: 4px;
+        font-size: 0.72rem;
+      }
+
       .selector-chip {
-        width: 64px;
+        width: 70px;
         min-height: 54px;
-        font-size: 0.64rem;
+        font-size: 0.61rem;
         padding: 7px 5px;
       }
 
       .selector-chip strong {
-        font-size: 0.68rem;
+        font-size: 0.66rem;
       }
 
       .selector-chip span {
-        font-size: 0.58rem;
+        font-size: 0.53rem;
       }
 
       .guess-row {
@@ -1451,16 +1498,22 @@
       }
 
       .guess-line {
-        grid-template-columns: 58px minmax(0, 1fr);
+        grid-template-columns: 64px minmax(0, 1fr);
       }
 
       .topbar {
-        gap: 8px 6px;
+        gap: 8px;
       }
 
       .top-actions {
-        max-width: 208px;
         gap: 5px;
+        width: 100%;
+      }
+
+      .top-actions > .icon-btn {
+        min-height: 50px;
+        padding-inline: 4px;
+        font-size: 0.64rem;
       }
 
       .eyebrow {
@@ -1478,17 +1531,17 @@
       }
 
       .selector-chip {
-        width: 58px;
+        width: 64px;
         min-height: 52px;
-        font-size: 0.6rem;
+        font-size: 0.56rem;
       }
 
       .selector-chip strong {
-        font-size: 0.64rem;
+        font-size: 0.61rem;
       }
 
       .selector-chip span {
-        font-size: 0.55rem;
+        font-size: 0.5rem;
       }
 
       .guess-row {
@@ -1516,15 +1569,14 @@
   <div class="shell">
     <main class="game">
       <header class="topbar">
-        <button id="helpButton" class="icon-btn" type="button">Rules</button>
         <div class="title-wrap">
           <span id="modeEyebrow" class="eyebrow">Graph Word Game</span>
           <h1 class="title">Curvele</h1>
         </div>
         <div class="top-actions">
+          <button id="helpButton" class="icon-btn" type="button">Rules</button>
           <button id="modesButton" class="icon-btn" type="button">Modes</button>
           <button id="statsButton" class="icon-btn" type="button">Stats</button>
-          <button id="summaryButton" class="icon-btn" type="button" hidden>Round Summary</button>
           <button id="settingsButton" class="icon-btn" type="button">Settings</button>
           <button id="newGame" class="icon-btn" type="button"><span>New Word</span></button>
         </div>
@@ -1540,7 +1592,7 @@
         <div class="board-shell panel-card" id="boardShell" tabindex="0">
           <div class="board-header">
             <h2 class="board-title">Words Guessed</h2>
-            <p id="boardModeCopy" class="board-copy">Tap the active row to type. Press Enter to submit your word.</p>
+            <p id="boardModeCopy" class="board-copy"></p>
           </div>
           <input id="wordInput" class="hidden-input" type="text" maxlength="5" autocomplete="off" spellcheck="false">
           <div class="hint-row" id="hintRow">Tap the current row to type a real five-letter word, then compare your colored line to the white answer line.</div>
@@ -1743,6 +1795,13 @@
       <div class="settings-row">
         <label class="setting-item">
           <div>
+            <strong>Hard Mode</strong>
+            <span>Any exact green letter you discover must stay locked into that same position on later guesses.</span>
+          </div>
+          <input id="hardModeToggle" class="toggle" type="checkbox">
+        </label>
+        <label class="setting-item">
+          <div>
             <strong>Light Mode</strong>
             <span>Switch the board and panels to a brighter palette.</span>
           </div>
@@ -1778,24 +1837,10 @@
         </label>
         <label class="setting-item">
           <div>
-            <strong>Show All Guess Lines</strong>
-            <span>Keep every guess line bright on the graph instead of only spotlighting a few at once.</span>
-          </div>
-          <input id="showAllLinesToggle" class="toggle" type="checkbox">
-        </label>
-        <label class="setting-item">
-          <div>
             <strong>Reduced Motion</strong>
             <span>Lower the amount of animation and make reveals feel quicker and calmer.</span>
           </div>
           <input id="reducedMotionToggle" class="toggle" type="checkbox">
-        </label>
-        <label class="setting-item">
-          <div>
-            <strong>Hard Mode</strong>
-            <span>Any exact green letter you discover must stay locked into that same position on later guesses.</span>
-          </div>
-          <input id="hardModeToggle" class="toggle" type="checkbox">
         </label>
       </div>
       <div class="modal-actions">
@@ -1835,14 +1880,15 @@
           <strong>Answer Word</strong>
           <input id="customWordInput" class="custom-input" type="text" maxlength="12" placeholder="Type 3 to 12 letters">
         </label>
-        <p id="customWordNote" class="custom-note">Custom games can use any 3 to 12 letter alphabetic answer. Shared custom puzzles keep the same answer for everyone with that link.</p>
+        <p id="customWordNote" class="custom-note">Custom games can use any 3 to 12 letters, and you can hold backslash for 5 seconds to add one blank graph point.</p>
         <div id="manualCopyWrap" class="custom-field" hidden>
-          <strong>Copy That Link</strong>
+          <strong>Copy This Link</strong>
           <input id="manualCopyLink" class="manual-link-box" type="text" readonly>
         </div>
       </div>
       <div class="modal-actions">
         <button id="copyCustomLink" class="action-btn" type="button">Copy Link</button>
+        <button id="showManualLink" class="action-btn" type="button">Show Manual Link</button>
         <button id="playCustomNow" class="action-btn" type="button">Play Here</button>
         <button id="closeCustom" class="action-btn" type="button">Done</button>
       </div>
@@ -1896,7 +1942,6 @@
     const newGameButton = document.getElementById("newGame");
     const modesButton = document.getElementById("modesButton");
     const statsButton = document.getElementById("statsButton");
-    const summaryButton = document.getElementById("summaryButton");
     const settingsButton = document.getElementById("settingsButton");
     const helpButton = document.getElementById("helpButton");
     const startOverlay = document.getElementById("startOverlay");
@@ -1937,7 +1982,6 @@
     const qwertyToggle = document.getElementById("qwertyToggle");
     const desktopKeyboardToggle = document.getElementById("desktopKeyboardToggle");
     const highContrastToggle = document.getElementById("highContrastToggle");
-    const showAllLinesToggle = document.getElementById("showAllLinesToggle");
     const reducedMotionToggle = document.getElementById("reducedMotionToggle");
     const hardModeToggle = document.getElementById("hardModeToggle");
     const statsOverlay = document.getElementById("statsOverlay");
@@ -1955,6 +1999,7 @@
     const manualCopyWrap = document.getElementById("manualCopyWrap");
     const manualCopyLink = document.getElementById("manualCopyLink");
     const copyCustomLinkButton = document.getElementById("copyCustomLink");
+    const showManualLinkButton = document.getElementById("showManualLink");
     const playCustomNowButton = document.getElementById("playCustomNow");
     const closeCustomButton = document.getElementById("closeCustom");
     const confirmOverlay = document.getElementById("confirmOverlay");
@@ -1977,10 +2022,12 @@
     const PADDING_Y = 30;
     const GRID_LINES = 5;
     const MAX_GUESSES = 6;
-    const MAX_ACTIVE_LINES = 3;
     const DEFAULT_WORD_LENGTH = 5;
     const MIN_CUSTOM_WORD_LENGTH = 3;
     const MAX_CUSTOM_WORD_LENGTH = 12;
+    const CUSTOM_GHOST_CHAR = "~";
+    const CUSTOM_GHOST_DISPLAY = "□";
+    const CUSTOM_GHOST_HOLD_MS = 5000;
     const DAILY_TIME_ZONE = "America/New_York";
     const DAILY_POOL_SIZE = 500;
     const DAILY_EPOCH = { year: 2026, month: 4, day: 28 };
@@ -2051,12 +2098,13 @@
       isOver: false,
       activeGuessIndices: [],
       lastAnimatedGuessIndex: -1,
+      lastToggledGuessIndex: -1,
+      lastToggledGuessVisible: false,
       lightMode: false,
       easyMode: false,
       keyboardLayout: "qwerty",
       desktopKeyboard: false,
       highContrastGuides: false,
-      showAllGuessLines: false,
       reducedMotion: false,
       hardMode: false,
       isTouchDevice: window.matchMedia("(pointer: coarse)").matches,
@@ -2086,6 +2134,11 @@
       newWordCooldownTimer: null,
       newWordCooldownActive: false,
       newWordCooldownRemaining: 0,
+      customGhostHoldTimer: null,
+      ghostDisplayValues: [],
+      ghostAnimationFrame: null,
+      ghostAnimationState: null,
+      lastAnimatedGuessDelay: 0,
       stats: loadStats(),
       allowedWords: new Set(ALLOWED_WORDS),
       fullAllowedWords: new Set(ALLOWED_WORDS),
@@ -2127,6 +2180,169 @@
 
     function sanitizeWord(raw) {
       return raw.toUpperCase().replace(/[^A-Z]/g, "").slice(0, state.wordLength || DEFAULT_WORD_LENGTH);
+    }
+
+    function displayWord(word = "") {
+      return String(word).replaceAll(CUSTOM_GHOST_CHAR, CUSTOM_GHOST_DISPLAY);
+    }
+
+    function hasGhostCharacter(word = "") {
+      return String(word).includes(CUSTOM_GHOST_CHAR);
+    }
+
+    function customWordToInternal(raw = "") {
+      return raw
+        .toUpperCase()
+        .replaceAll(CUSTOM_GHOST_DISPLAY, CUSTOM_GHOST_CHAR)
+        .replace(new RegExp(`[^A-Z${CUSTOM_GHOST_CHAR.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}]`, "g"), "")
+        .slice(0, MAX_CUSTOM_WORD_LENGTH);
+    }
+
+    function setCustomWordInputValue(word = "") {
+      customWordInput.value = displayWord(word);
+    }
+
+    function getCustomWordInputValue() {
+      return customWordToInternal(customWordInput.value);
+    }
+
+    function updateCustomWordNote(value = "") {
+      manualCopyWrap.hidden = true;
+      customWordNote.classList.remove("recommended", "caution");
+      if (value.length >= 5 && value.length <= 7) {
+        customWordNote.textContent = `${value.length} characters: recommended. This size usually feels best to play.`;
+        customWordNote.classList.add("recommended");
+      } else if (value.length >= MIN_CUSTOM_WORD_LENGTH) {
+        customWordNote.textContent = `${value.length} characters: not recommended. It will still work, but 5 to 7 characters usually plays better.`;
+        customWordNote.classList.add("caution");
+      } else {
+        customWordNote.textContent = "Custom games can use any 3 to 12 letters, and you can hold backslash for 5 seconds to add one blank graph point.";
+      }
+    }
+
+    function clearCustomGhostHold() {
+      if (state.customGhostHoldTimer) {
+        clearTimeout(state.customGhostHoldTimer);
+        state.customGhostHoldTimer = null;
+      }
+    }
+
+    function clampValue(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function stopGhostAnimation() {
+      if (state.ghostAnimationFrame) {
+        cancelAnimationFrame(state.ghostAnimationFrame);
+        state.ghostAnimationFrame = null;
+      }
+      state.ghostAnimationState = null;
+    }
+
+    function computeBaseGhostValues(word) {
+      const values = word.split("").map((char) => toValue(char));
+      return values.map((value, index) => {
+        if (value !== null) {
+          return value;
+        }
+        const previousReal = [...values.slice(0, index)].reverse().find((entry) => entry !== null);
+        const nextReal = values.slice(index + 1).find((entry) => entry !== null);
+        return previousReal !== undefined && nextReal !== undefined
+          ? (previousReal + nextReal) / 2
+          : previousReal !== undefined
+            ? previousReal
+            : nextReal !== undefined
+              ? nextReal
+              : 12.5;
+      });
+    }
+
+    function initializeGhostDisplayValues(word) {
+      state.ghostDisplayValues = hasGhostCharacter(word) ? computeBaseGhostValues(word) : [];
+    }
+
+    function currentVisibleGhostLetters() {
+      if (!hasGhostCharacter(state.secret)) {
+        return [];
+      }
+      return state.secret.split("").map((char, index) => (
+        char === CUSTOM_GHOST_CHAR
+          ? String.fromCharCode(65 + Math.round(clampValue(state.ghostDisplayValues[index] ?? 12.5, 0, 25)))
+          : char
+      ));
+    }
+
+    function findNextGhostValue(index, currentValue, pendingGuess) {
+      const guessedValues = new Set(
+        state.guesses
+          .map((entry) => entry.word[index])
+          .concat(pendingGuess ? [pendingGuess[index]] : [])
+          .filter(Boolean)
+          .map((char) => toValue(char))
+          .filter((value) => value !== null)
+      );
+      const start = Math.round(clampValue(currentValue, 0, 25));
+      for (let step = 1; step <= 25; step += 1) {
+        const candidate = (start + step) % 26;
+        if (!guessedValues.has(candidate)) {
+          return candidate;
+        }
+      }
+      return (start + 1) % 26;
+    }
+
+    function startGhostDrift(pendingGuess = "") {
+      if (!hasGhostCharacter(state.secret)) {
+        return false;
+      }
+      const fromValues = [...state.ghostDisplayValues];
+      const visibleLetters = currentVisibleGhostLetters();
+      const toValues = [...fromValues];
+      let changed = false;
+      state.secret.split("").forEach((char, index) => {
+        if (char !== CUSTOM_GHOST_CHAR) {
+          return;
+        }
+        if (pendingGuess[index] === visibleLetters[index]) {
+          toValues[index] = findNextGhostValue(index, fromValues[index] ?? 12.5, pendingGuess);
+          changed = true;
+        }
+      });
+      if (!changed) {
+        return false;
+      }
+      stopGhostAnimation();
+      if (state.reducedMotion) {
+        state.ghostDisplayValues = toValues;
+        renderGraph();
+        return true;
+      }
+      const duration = 3200;
+      const startAt = performance.now();
+      state.ghostAnimationState = { fromValues, toValues, startAt, duration };
+      const tick = (now) => {
+        const elapsed = now - startAt;
+        const progress = clampValue(elapsed / duration, 0, 1);
+        const eased = progress * progress * (3 - 2 * progress);
+        state.ghostDisplayValues = fromValues.map((value, index) => {
+          const target = toValues[index];
+          if (target === undefined || target === value) {
+            return value;
+          }
+          return value + (target - value) * eased;
+        });
+        renderGraph();
+        if (progress < 1) {
+          state.ghostAnimationFrame = requestAnimationFrame(tick);
+        } else {
+          state.ghostDisplayValues = toValues;
+          state.ghostAnimationFrame = null;
+          state.ghostAnimationState = null;
+          renderGraph();
+        }
+      };
+      state.ghostAnimationFrame = requestAnimationFrame(tick);
+      return true;
     }
 
     function seededRandom(seed) {
@@ -2256,15 +2472,40 @@
     }
 
     function toValue(char) {
+      if (char === CUSTOM_GHOST_CHAR) {
+        return null;
+      }
       return char.charCodeAt(0) - 65;
     }
 
-    function buildPoints(word) {
+    function buildResolvedValues(word) {
+      const values = word.split("").map((char) => toValue(char));
+      const baseValues = computeBaseGhostValues(word);
+      return values.map((value, index) => (
+        value === null && state.ghostDisplayValues[index] !== undefined
+          ? state.ghostDisplayValues[index]
+          : baseValues[index]
+      ));
+    }
+
+    function shownWordForDisplay(word) {
+      if (!hasGhostCharacter(word)) {
+        return word;
+      }
+      const resolvedValues = buildResolvedValues(word);
+      return word.split("").map((char, index) => (
+        char === CUSTOM_GHOST_CHAR
+          ? String.fromCharCode(65 + Math.round(clampValue(resolvedValues[index], 0, 25)))
+          : char
+      )).join("");
+    }
+
+    function buildPoints(word, options = {}) {
       const length = Math.max(1, word.length);
       const stepX = length === 1 ? 0 : (WIDTH - PADDING_X * 2) / (length - 1);
+      const resolvedValues = buildResolvedValues(word, options);
       return word.split("").map((char, index) => {
-        const value = toValue(char);
-        const normalized = value / 25;
+        const normalized = resolvedValues[index] / 25;
         return {
           x: PADDING_X + stepX * index,
           y: HEIGHT - PADDING_Y - normalized * (HEIGHT - PADDING_Y * 2)
@@ -2345,7 +2586,7 @@
     function renderGraph() {
       const targetPoints = buildPoints(state.secret);
       const targetPath = pathFromPoints(targetPoints);
-      const activeSet = new Set(state.showAllGuessLines ? state.guesses.map((_, index) => index) : state.activeGuessIndices);
+      const activeSet = new Set(state.activeGuessIndices);
       const matchedPositions = Array(state.wordLength).fill(false);
       const answerOutline = document.body.classList.contains("light-mode") ? "#1c2a44" : "rgba(0,0,0,0.32)";
       const winningGuess = state.wonLastRound ? state.guesses[state.guesses.length - 1] : null;
@@ -2373,10 +2614,23 @@
         const strokeWidth = active ? 6 : 4;
         const circleOpacity = active ? 0.95 : 0.14;
         const shouldAnimate = index === state.lastAnimatedGuessIndex;
-        const animationStyle = shouldAnimate && !state.reducedMotion ? `stroke-dasharray: var(--path-length); stroke-dashoffset: var(--path-length); animation: drawLine 2200ms ease forwards;` : "";
+        const isToggleTarget = index === state.lastToggledGuessIndex;
+        const toggleAnimation = !state.reducedMotion && isToggleTarget
+          ? (active
+              ? "animation: toggleLineIn 260ms ease forwards;"
+              : "animation: toggleLineOut 260ms ease forwards;")
+          : "";
+        const pointToggleAnimation = !state.reducedMotion && isToggleTarget
+          ? (active
+              ? "animation: togglePointIn 260ms ease forwards;"
+              : "animation: togglePointOut 260ms ease forwards;")
+          : "";
+        const animationStyle = shouldAnimate && !state.reducedMotion
+          ? `stroke-dasharray: var(--path-length); stroke-dashoffset: var(--path-length); animation: drawLine 2200ms ease ${state.lastAnimatedGuessDelay}ms forwards;`
+          : toggleAnimation;
         return `
           <path d="${path}" fill="none" stroke="${guess.color}" stroke-width="${strokeWidth}" stroke-linecap="round" opacity="${opacity}" pathLength="100" style="--path-length: 100; ${animationStyle}" />
-          ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="${active ? 6 : 5}" fill="${guess.color}" fill-opacity="${circleOpacity}" stroke="var(--point-stroke)" stroke-width="2.5" />`).join("")}
+          ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="${active ? 6 : 5}" fill="${guess.color}" fill-opacity="${circleOpacity}" stroke="var(--point-stroke)" stroke-width="2.5" style="${pointToggleAnimation}" />`).join("")}
         `;
       }).join("");
 
@@ -2413,6 +2667,9 @@
           </linearGradient>
         </defs>
       `;
+      state.lastAnimatedGuessIndex = -1;
+      state.lastAnimatedGuessDelay = 0;
+      state.lastToggledGuessIndex = -1;
     }
 
     function renderBoard() {
@@ -2423,10 +2680,10 @@
         const preview = activeRow ? sanitizeWord(input.value) : "";
         const cells = [];
         const exists = i < state.guesses.length;
-        const active = state.showAllGuessLines ? exists : state.activeGuessIndices.includes(i);
+        const active = state.activeGuessIndices.includes(i);
 
         for (let j = 0; j < state.wordLength; j += 1) {
-          const char = guess ? guess.word[j] : (preview[j] || "");
+          const char = guess ? displayWord(guess.word[j] || "") : displayWord(preview[j] || "");
           const klass = [
             char ? "filled" : "",
             guess ? `guess-${i}` : "",
@@ -2441,7 +2698,7 @@
           <div class="guess-line">
             <button class="selector-chip ${exists ? (active ? "active" : "inactive") : "pending"} guess-${i}" data-index="${i}" type="button">
               <strong>Guess ${i + 1}</strong>
-              <span>${exists ? (state.showAllGuessLines ? "all shown" : (active ? "tap to hide" : "tap to show")) : (activeRow ? "tap row to type" : "waiting")}</span>
+              <span>${exists ? (active ? "tap to hide" : "tap to show") : (activeRow ? "ready" : "waiting")}</span>
             </button>
             <div class="guess-row" data-guess-row="${i}" style="grid-template-columns: repeat(${state.wordLength}, minmax(0, 1fr));">${cells.join("")}</div>
           </div>
@@ -2453,9 +2710,6 @@
           event.stopPropagation();
           const index = Number(button.dataset.index);
           if (index < state.guesses.length) {
-            if (state.showAllGuessLines) {
-              return;
-            }
             activateGuess(index);
           } else if (index === state.guesses.length && !state.isOver) {
             input.focus();
@@ -2480,7 +2734,6 @@
     }
 
     function renderSummaryButton() {
-      summaryButton.hidden = !(state.isOver && resultOverlay.hidden);
     }
 
     function renderTopControls() {
@@ -2488,7 +2741,6 @@
       helpButton.hidden = lockUi;
       modesButton.hidden = false;
       statsButton.hidden = lockUi;
-      summaryButton.hidden = lockUi ? true : !(state.isOver && resultOverlay.hidden);
       settingsButton.hidden = lockUi;
       newGameButton.hidden = lockUi || state.mode === "custom";
     }
@@ -2518,7 +2770,7 @@
     }
 
     function renderNewWordButton() {
-      const label = state.mode === "daily" ? "Unlimited" : "New Word";
+      const label = "New Word";
       if (state.newWordCooldownActive) {
         newGameButton.disabled = true;
         newGameButton.classList.add("cooldown");
@@ -2533,7 +2785,7 @@
 
     function renderModeChrome() {
       modeEyebrow.textContent = "Graph Word Game";
-      boardModeCopy.innerHTML = "Tap the active row to type, press Enter to submit, and compare your colored line to the white answer line.";
+      boardModeCopy.innerHTML = "";
       renderTopControls();
     }
 
@@ -2672,26 +2924,37 @@
     function encodeCustomWord(word) {
       return word
         .split("")
-        .map((char, index) => ((toValue(char) + 7 + index) % 26).toString(36))
+        .map((char, index) => {
+          const value = char === CUSTOM_GHOST_CHAR ? 26 : toValue(char);
+          return ((value + 7 + index) % 36).toString(36).padStart(2, "0");
+        })
         .join("");
     }
 
     function decodeCustomToken(token) {
-      if (!token || token.length < MIN_CUSTOM_WORD_LENGTH) return "";
-      const letters = token.split("").map((char, index) => {
-        const value = parseInt(char, 36);
-        if (Number.isNaN(value) || value < 0 || value > 25) return "";
-        return String.fromCharCode(65 + ((value - 7 - index + 260) % 26));
+      if (!token || token.length < MIN_CUSTOM_WORD_LENGTH * 2 || token.length % 2 !== 0) return "";
+      const chunks = token.match(/.{2}/g) || [];
+      const letters = chunks.map((chunk, index) => {
+        const value = parseInt(chunk, 36);
+        if (Number.isNaN(value) || value < 0 || value > 35) return "";
+        const decoded = (value - 7 - index + 360) % 36;
+        if (decoded === 26) {
+          return CUSTOM_GHOST_CHAR;
+        }
+        if (decoded < 0 || decoded > 25) {
+          return "";
+        }
+        return String.fromCharCode(65 + decoded);
       });
       const word = letters.join("");
-      if (!new RegExp(`^[A-Z]{${MIN_CUSTOM_WORD_LENGTH},${MAX_CUSTOM_WORD_LENGTH}}$`).test(word)) {
+      if (!new RegExp(`^[A-Z${CUSTOM_GHOST_CHAR.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}]{${MIN_CUSTOM_WORD_LENGTH},${MAX_CUSTOM_WORD_LENGTH}}$`).test(word)) {
         return "";
       }
       return word;
     }
 
     function customHashForWord(word) {
-      return `#p=${encodeURIComponent(encodeCustomWord(word))}`;
+      return `#p2=${encodeURIComponent(encodeCustomWord(word))}`;
     }
 
     function getBaseShareUrl() {
@@ -2699,13 +2962,27 @@
     }
 
     function readCustomWordFromUrl() {
-      const match = window.location.hash.match(/p=([0-9a-z]+)/i);
-      if (!match) return "";
-      const decoded = decodeCustomToken(decodeURIComponent(match[1] || ""));
-      if (decoded.length < MIN_CUSTOM_WORD_LENGTH || decoded.length > MAX_CUSTOM_WORD_LENGTH) {
+      const newMatch = window.location.hash.match(/p2=([0-9a-z]+)/i);
+      if (newMatch) {
+        const decoded = decodeCustomToken(decodeURIComponent(newMatch[1] || ""));
+        if (decoded.length >= MIN_CUSTOM_WORD_LENGTH && decoded.length <= MAX_CUSTOM_WORD_LENGTH) {
+          return decoded;
+        }
+      }
+      const oldMatch = window.location.hash.match(/p=([0-9a-z]+)/i);
+      if (!oldMatch) {
         return "";
       }
-      return decoded;
+      const legacyLetters = oldMatch[1].split("").map((char, index) => {
+        const value = parseInt(char, 36);
+        if (Number.isNaN(value) || value < 0 || value > 25) return "";
+        return String.fromCharCode(65 + ((value - 7 - index + 260) % 26));
+      });
+      const word = legacyLetters.join("");
+      if (!new RegExp(`^[A-Z]{${MIN_CUSTOM_WORD_LENGTH},${MAX_CUSTOM_WORD_LENGTH}}$`).test(word)) {
+        return "";
+      }
+      return word;
     }
 
     function buildShareTextSafe() {
@@ -2897,25 +3174,26 @@
     function syncActiveGuessesAfterAdd() {
       const newestIndex = state.guesses.length - 1;
       state.activeGuessIndices = state.activeGuessIndices.filter((index) => index < newestIndex + 1);
-      state.activeGuessIndices.push(newestIndex);
-      while (state.activeGuessIndices.length > MAX_ACTIVE_LINES) {
-        state.activeGuessIndices.shift();
+      if (!state.activeGuessIndices.includes(newestIndex)) {
+        state.activeGuessIndices.push(newestIndex);
       }
     }
 
     function activateGuess(index) {
       if (index >= state.guesses.length) return;
-      if (state.showAllGuessLines) return;
       const existingIndex = state.activeGuessIndices.indexOf(index);
       if (existingIndex !== -1) {
         state.activeGuessIndices.splice(existingIndex, 1);
+        state.lastToggledGuessVisible = false;
       } else {
         state.activeGuessIndices.push(index);
-        while (state.activeGuessIndices.length > MAX_ACTIVE_LINES) {
-          state.activeGuessIndices.shift();
-        }
+        state.activeGuessIndices.sort((a, b) => a - b);
+        state.lastToggledGuessVisible = true;
       }
+      state.lastToggledGuessIndex = index;
+      state.lastAnimatedGuessIndex = -1;
       renderGraph();
+      renderBoard();
       setHint("Bright cards are the lines currently emphasized on the graph. Faded ones still linger in the background.");
     }
 
@@ -2965,13 +3243,13 @@
         : win
         ? `Nice work${state.playerName ? `, ${state.playerName}` : ""}. The board finished the curve, and your guess matched the hidden word.`
         : `${state.playerName ? `${state.playerName}, ` : ""}the board finished revealing the round, and you used all six tries before landing on the correct word.`;
-      resultWord.textContent = `The word was ${state.secret}.`;
+      resultWord.textContent = `The word was ${visibleSecretWord()}.`;
       resultTries.textContent = `${state.guesses.length} of ${MAX_GUESSES}`;
       resultMode.textContent = mode === "reset"
         ? `${state.mode === "daily" ? "Daily" : state.mode === "custom" ? "Custom" : "Unlimited"} Reset`
         : `${state.mode === "daily" ? "Daily" : state.mode === "custom" ? "Custom" : "Unlimited"} ${win ? "Win" : "Loss"}`;
       resultMatches.textContent = `${exactMatches} of ${state.wordLength} points matched on your last guess`;
-      resultLastGuess.textContent = latestGuess ? latestGuess.word : "No final guess";
+      resultLastGuess.textContent = latestGuess ? displayWord(latestGuess.word) : "No final guess";
       resultNextDaily.textContent = formatCountdown(getNextDailyCountdownMs());
       resultShareCopy.textContent = state.mode === "custom"
         ? "Share this result, or jump back to the board to keep studying how the custom curve matched up."
@@ -2993,6 +3271,10 @@
       }
     }
 
+    function visibleSecretWord() {
+      return shownWordForDisplay(state.secret);
+    }
+
     function applySettings() {
       document.body.classList.toggle("light-mode", state.lightMode);
       document.body.classList.toggle("high-contrast-guides", state.highContrastGuides);
@@ -3005,7 +3287,6 @@
       qwertyToggle.checked = state.keyboardLayout === "qwerty";
       desktopKeyboardToggle.checked = state.desktopKeyboard;
       highContrastToggle.checked = state.highContrastGuides;
-      showAllLinesToggle.checked = state.showAllGuessLines;
       reducedMotionToggle.checked = state.reducedMotion;
       hardModeToggle.checked = state.hardMode;
       input.maxLength = state.wordLength;
@@ -3045,9 +3326,12 @@
       state.secret = options.secret || randomWord(mode);
       state.wordLength = state.secret.length || DEFAULT_WORD_LENGTH;
       input.maxLength = state.wordLength;
+      clearCustomGhostHold();
+      stopGhostAnimation();
+      initializeGhostDisplayValues(state.secret);
       if (mode === "custom") {
         window.location.hash = customHashForWord(state.secret);
-      } else if (window.location.hash.startsWith("#p=")) {
+      } else if (window.location.hash.startsWith("#p=") || window.location.hash.startsWith("#p2=")) {
         history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
         state.linkedCustomWord = "";
         state.linkedCustomLocked = false;
@@ -3057,6 +3341,7 @@
       state.resultShowsDailyCountdown = false;
       state.activeGuessIndices = [];
       state.lastAnimatedGuessIndex = -1;
+      state.lastAnimatedGuessDelay = 0;
       state.previewNeedsResetWarning = true;
       input.value = "";
       resultOverlay.hidden = true;
@@ -3100,7 +3385,7 @@
 
     function submitGuess() {
       if (state.isOver) {
-        setStatus(`This round is over. Press New Word to play again. The word was ${state.secret}.`);
+        setStatus(`This round is over. Press New Word to play again. The word was ${visibleSecretWord()}.`);
         return;
       }
 
@@ -3154,10 +3439,17 @@
       });
       state.lastAnimatedGuessIndex = state.guesses.length - 1;
       syncActiveGuessesAfterAdd();
+      state.lastAnimatedGuessDelay = 0;
+      if (state.mode === "custom" && hasGhostCharacter(state.secret)) {
+        const driftStarted = startGhostDrift(guess);
+        if (driftStarted) {
+          state.lastAnimatedGuessDelay = 1000;
+        }
+      }
 
       if (guess === state.secret) {
         state.isOver = true;
-        setStatus(`Correct. You found ${state.secret}.`);
+        setStatus(`Correct. You found ${visibleSecretWord()}.`);
         setHint("That round is complete.");
       } else if (state.guesses.length === MAX_GUESSES) {
         state.isOver = true;
@@ -3199,7 +3491,9 @@
 
       if (event.key === "\\" && input.value.toUpperCase() === "ZXCV") {
         event.preventDefault();
-        input.value = state.secret;
+        input.value = state.mode === "custom" && hasGhostCharacter(state.secret)
+          ? shownWordForDisplay(state.secret)
+          : state.secret;
         state.answerHackVisible = true;
         renderBoard();
         return;
@@ -3231,12 +3525,6 @@
     });
     modesButton.addEventListener("click", () => {
       modesOverlay.hidden = false;
-    });
-    summaryButton.addEventListener("click", () => {
-      if (!state.isOver) {
-        return;
-      }
-      showResult(state.wonLastRound);
     });
     settingsButton.addEventListener("click", () => {
       settingsOverlay.hidden = false;
@@ -3286,6 +3574,7 @@
     modeCustomButton.addEventListener("click", () => {
       modesOverlay.hidden = true;
       customOverlay.hidden = false;
+      updateCustomWordNote(getCustomWordInputValue());
       customWordInput.focus();
     });
     modeTutorialButton.addEventListener("click", () => {
@@ -3349,6 +3638,7 @@
       input.focus();
     });
     closeCustomButton.addEventListener("click", () => {
+      clearCustomGhostHold();
       customOverlay.hidden = true;
       manualCopyWrap.hidden = true;
       input.focus();
@@ -3386,11 +3676,6 @@
       state.highContrastGuides = event.target.checked;
       applySettings();
     });
-    showAllLinesToggle.addEventListener("change", (event) => {
-      state.showAllGuessLines = event.target.checked;
-      renderGraph();
-      renderBoard();
-    });
     reducedMotionToggle.addEventListener("change", (event) => {
       state.reducedMotion = event.target.checked;
       renderGraph();
@@ -3400,26 +3685,36 @@
       applySettings();
     });
     customWordInput.addEventListener("input", (event) => {
-      const value = event.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, MAX_CUSTOM_WORD_LENGTH);
-      event.target.value = value;
-      manualCopyWrap.hidden = true;
-      customWordNote.classList.remove("recommended", "caution");
-      if (value.length >= 5 && value.length <= 7) {
-        customWordNote.textContent = `${value.length} letters: recommended. This size usually feels best to play.`;
-        customWordNote.classList.add("recommended");
-      } else if (value.length >= MIN_CUSTOM_WORD_LENGTH) {
-        customWordNote.textContent = `${value.length} letters: not recommended. It will still work, but 5 to 7 letters usually plays better.`;
-        customWordNote.classList.add("caution");
-      } else {
-        customWordNote.textContent = "Custom games can use any 3 to 12 letter alphabetic answer. Shared custom puzzles keep the same answer for everyone with that link.";
-      }
+      const value = customWordToInternal(event.target.value);
+      setCustomWordInputValue(value);
+      updateCustomWordNote(value);
     });
     customWordInput.addEventListener("keydown", (event) => {
+      if (event.key === "\\") {
+        if (event.repeat) {
+          event.preventDefault();
+          return;
+        }
+        event.preventDefault();
+        clearCustomGhostHold();
+        state.customGhostHoldTimer = setTimeout(() => {
+          const current = getCustomWordInputValue();
+          if (current.length >= MAX_CUSTOM_WORD_LENGTH) {
+            showToast("Custom words max out at 12 characters");
+            return;
+          }
+          const nextValue = `${current}${CUSTOM_GHOST_CHAR}`;
+          setCustomWordInputValue(nextValue);
+          updateCustomWordNote(nextValue);
+          showToast("Blank graph point added");
+        }, CUSTOM_GHOST_HOLD_MS);
+        return;
+      }
       if (event.key !== "Enter") {
         return;
       }
       event.preventDefault();
-      const word = customWordInput.value.toUpperCase().replace(/[^A-Z]/g, "");
+      const word = getCustomWordInputValue();
       if (word.length < MIN_CUSTOM_WORD_LENGTH) {
         showToast("Type at least 3 letters");
         return;
@@ -3431,7 +3726,7 @@
       showToast("Manual copy link ready");
     });
     playCustomNowButton.addEventListener("click", () => {
-      const word = customWordInput.value.toUpperCase().replace(/[^A-Z]/g, "");
+      const word = getCustomWordInputValue();
       if (word.length < MIN_CUSTOM_WORD_LENGTH) {
         showToast("Type at least 3 letters");
         return;
@@ -3442,7 +3737,7 @@
       input.focus();
     });
     copyCustomLinkButton.addEventListener("click", async () => {
-      const word = customWordInput.value.toUpperCase().replace(/[^A-Z]/g, "");
+      const word = getCustomWordInputValue();
       if (word.length < MIN_CUSTOM_WORD_LENGTH) {
         showToast("Type at least 3 letters");
         return;
@@ -3460,6 +3755,24 @@
         showToast("Could not copy link. Manual copy appearing.");
       }
     });
+    showManualLinkButton.addEventListener("click", () => {
+      const word = getCustomWordInputValue();
+      if (word.length < MIN_CUSTOM_WORD_LENGTH) {
+        showToast("Type at least 3 letters");
+        return;
+      }
+      manualCopyLink.value = `${getBaseShareUrl()}${customHashForWord(word)}`;
+      manualCopyWrap.hidden = false;
+      manualCopyLink.focus();
+      manualCopyLink.select();
+      showToast("Manual copy link ready");
+    });
+    customWordInput.addEventListener("keyup", (event) => {
+      if (event.key === "\\") {
+        clearCustomGhostHold();
+      }
+    });
+    customWordInput.addEventListener("blur", clearCustomGhostHold);
     document.addEventListener("keydown", (event) => {
       if (startOverlay.hidden && rulesOverlay.hidden && settingsOverlay.hidden && resultOverlay.hidden && statsOverlay.hidden && customOverlay.hidden && modesOverlay.hidden && tutorialOverlay.hidden && !state.isOver) {
         const isTypingKey = event.key.length === 1 || event.key === "Backspace";
@@ -3472,6 +3785,7 @@
     if (state.isTouchDevice) {
       input.readOnly = true;
     }
+    updateCustomWordNote(getCustomWordInputValue());
     state.linkedCustomWord = readCustomWordFromUrl();
     state.dailyCompletedKey = hasCompletedDaily() ? getCurrentDailyKey() : "";
     applySettings();
