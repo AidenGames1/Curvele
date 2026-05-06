@@ -1262,25 +1262,39 @@
 
       .topbar {
         display: grid;
-        grid-template-columns: auto 1fr auto;
-        align-items: center;
-        gap: 8px;
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+          "title title"
+          "rules actions";
+        align-items: start;
+        gap: 10px 8px;
         padding: 10px 0 14px;
       }
 
+      #helpButton {
+        grid-area: rules;
+        justify-self: start;
+      }
+
       .top-actions {
+        grid-area: actions;
         justify-content: flex-end;
+        justify-self: end;
         gap: 6px;
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
+        max-width: min(100%, 232px);
       }
 
       .title-wrap {
+        grid-area: title;
         min-width: 0;
+        width: 100%;
+        text-align: center;
       }
 
       .eyebrow {
-        font-size: 0.58rem;
-        letter-spacing: 0.16em;
+        font-size: 0.64rem;
+        letter-spacing: 0.12em;
       }
 
       .title {
@@ -1289,18 +1303,19 @@
 
       .icon-btn,
       .action-btn {
-        padding: 9px 10px;
-        font-size: 0.84rem;
+        padding: 8px 9px;
+        font-size: 0.78rem;
         border-radius: 12px;
       }
 
       .graph-card {
-        padding: 16px 12px 12px 40px;
+        padding: 18px 12px 12px 44px;
       }
 
       .axis-label {
-        left: 12px;
-        font-size: 0.8rem;
+        left: 10px;
+        font-size: 1rem;
+        font-weight: 900;
       }
 
       .board-shell {
@@ -1320,23 +1335,23 @@
       }
 
       .guess-line {
-        grid-template-columns: 72px minmax(0, 1fr);
+        grid-template-columns: 64px minmax(0, 1fr);
         gap: 8px;
       }
 
       .selector-chip {
-        width: 72px;
-        min-height: 60px;
-        font-size: 0.7rem;
-        padding: 8px 6px;
+        width: 64px;
+        min-height: 54px;
+        font-size: 0.64rem;
+        padding: 7px 5px;
       }
 
       .selector-chip strong {
-        font-size: 0.74rem;
+        font-size: 0.68rem;
       }
 
       .selector-chip span {
-        font-size: 0.64rem;
+        font-size: 0.58rem;
       }
 
       .guess-row {
@@ -1423,12 +1438,12 @@
       }
 
       .graph-card {
-        padding: 14px 10px 10px 34px;
+        padding: 14px 10px 10px 38px;
       }
 
       .axis-label {
-        left: 9px;
-        font-size: 0.74rem;
+        left: 8px;
+        font-size: 0.92rem;
       }
 
       .board-shell {
@@ -1436,16 +1451,21 @@
       }
 
       .guess-line {
-        grid-template-columns: 66px minmax(0, 1fr);
+        grid-template-columns: 58px minmax(0, 1fr);
       }
 
       .topbar {
-        gap: 6px;
+        gap: 8px 6px;
+      }
+
+      .top-actions {
+        max-width: 208px;
+        gap: 5px;
       }
 
       .eyebrow {
-        font-size: 0.5rem;
-        letter-spacing: 0.12em;
+        font-size: 0.56rem;
+        letter-spacing: 0.1em;
       }
 
       .title {
@@ -1453,22 +1473,22 @@
       }
 
       .icon-btn {
-        padding: 8px 8px;
-        font-size: 0.76rem;
+        padding: 7px 8px;
+        font-size: 0.73rem;
       }
 
       .selector-chip {
-        width: 66px;
-        min-height: 56px;
-        font-size: 0.66rem;
+        width: 58px;
+        min-height: 52px;
+        font-size: 0.6rem;
       }
 
       .selector-chip strong {
-        font-size: 0.68rem;
+        font-size: 0.64rem;
       }
 
       .selector-chip span {
-        font-size: 0.59rem;
+        font-size: 0.55rem;
       }
 
       .guess-row {
@@ -1498,7 +1518,7 @@
       <header class="topbar">
         <button id="helpButton" class="icon-btn" type="button">Rules</button>
         <div class="title-wrap">
-          <span id="modeEyebrow" class="eyebrow">Daily Puzzle</span>
+          <span id="modeEyebrow" class="eyebrow">Graph Word Game</span>
           <h1 class="title">Curvele</h1>
         </div>
         <div class="top-actions">
@@ -1858,8 +1878,8 @@
     </div>
   </div>
 
-  <script src="guess-words.js"></script>
-  <script src="words.js"></script>
+  <script src="guess-words.js?v=20260505"></script>
+  <script src="words.js?v=20260505"></script>
   <script>
     const svg = document.getElementById("graph");
     const toastLayer = document.getElementById("toastLayer");
@@ -2005,12 +2025,12 @@
       return [];
     }
 
-    const ANSWER_WORDS = normalizeWordSource(window.CURVELE_WORDS).length
+    const ANSWER_WORDS = (normalizeWordSource(window.CURVELE_WORDS).length
       ? normalizeWordSource(window.CURVELE_WORDS)
-      : WORDS;
-    const GUESS_WORDS = normalizeWordSource(window.CURVELE_GUESS_WORDS).length
+      : WORDS).filter((word) => !BANNED_WORDS.has(word));
+    const GUESS_WORDS = (normalizeWordSource(window.CURVELE_GUESS_WORDS).length
       ? normalizeWordSource(window.CURVELE_GUESS_WORDS)
-      : ANSWER_WORDS;
+      : ANSWER_WORDS).filter((word) => !BANNED_WORDS.has(word));
     const ALLOWED_WORDS = [...new Set(GUESS_WORDS.concat(ANSWER_WORDS, EASTER_WORD))];
     const KEYBOARD_LAYOUTS = {
       abc: [
@@ -2371,7 +2391,7 @@
         return victoryDelays[Math.max(0, index - 1)] + victoryDurations[Math.max(0, index - 1)] - 60;
       });
 
-      const axisFont = state.isTouchDevice ? 24 : 18;
+      const axisFont = state.isTouchDevice ? 28 : 20;
       svg.innerHTML = `
         ${gridMarkup()}
         <text x="${PADDING_X - 34}" y="${PADDING_Y + 9}" fill="var(--muted)" font-size="${axisFont}" font-weight="900">Z</text>
@@ -2512,17 +2532,8 @@
     }
 
     function renderModeChrome() {
-      const modeLabel = state.mode === "daily"
-        ? "Daily Puzzle"
-        : state.mode === "custom"
-        ? `Custom ${state.wordLength}-Letter`
-        : "Unlimited Practice";
-      modeEyebrow.textContent = modeLabel;
-      boardModeCopy.innerHTML = state.mode === "daily"
-        ? "<strong>Daily puzzle:</strong> everyone gets the same answer today."
-        : state.mode === "custom"
-        ? `<strong>Custom challenge:</strong> this board is using a shared ${state.wordLength}-letter answer.`
-        : "<strong>Unlimited practice:</strong> tap New Word anytime for a fresh random round.";
+      modeEyebrow.textContent = "Graph Word Game";
+      boardModeCopy.innerHTML = "Tap the active row to type, press Enter to submit, and compare your colored line to the white answer line.";
       renderTopControls();
     }
 
