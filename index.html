@@ -17,18 +17,18 @@
       --muted: #b8c5e0;
       --grid: rgba(255, 255, 255, 0.12);
       --white-line: #ffffff;
-      --red: #ff8d98;
-      --blue: #89cbff;
-      --yellow: #ffe18a;
-      --green: #92f2bc;
-      --purple: #d7b3ff;
-      --orange: #ffc18c;
-      --red-tile: #ffd6db;
-      --blue-tile: #d8efff;
-      --yellow-tile: #fff0bf;
-      --green-tile: #dcfee9;
+      --red: #ff7a8b;
+      --blue: #72b9ff;
+      --yellow: #ffd84f;
+      --green: #8bf06f;
+      --purple: #c99fff;
+      --orange: #ffb05c;
+      --red-tile: #ffd2d8;
+      --blue-tile: #d8edff;
+      --yellow-tile: #fff0b3;
+      --green-tile: #e1ffd7;
       --purple-tile: #efdeff;
-      --orange-tile: #ffe3c8;
+      --orange-tile: #ffe1bf;
       --shadow: rgba(0, 0, 0, 0.34);
       --point-stroke: #101623;
     }
@@ -443,7 +443,7 @@
     .selector-chip.guess-0.active,
     .selector-chip.guess-0.pending {
       background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--blue);
-      border-color: rgba(137, 203, 255, 0.62);
+      border-color: rgba(114, 185, 255, 0.66);
       color: #17364d;
     }
 
@@ -452,7 +452,7 @@
     .selector-chip.guess-1.active,
     .selector-chip.guess-1.pending {
       background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--red);
-      border-color: rgba(255, 141, 152, 0.62);
+      border-color: rgba(255, 122, 139, 0.66);
       color: #521720;
     }
 
@@ -469,27 +469,27 @@
     .selector-chip.guess-3,
     .selector-chip.guess-3.active,
     .selector-chip.guess-3.pending {
-      background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--green);
-      border-color: rgba(146, 242, 188, 0.64);
-      color: #184a2e;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--purple);
+      border-color: rgba(201, 159, 255, 0.66);
+      color: #432560;
     }
 
     .guess-tile.guess-4,
     .selector-chip.guess-4,
     .selector-chip.guess-4.active,
     .selector-chip.guess-4.pending {
-      background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--purple);
-      border-color: rgba(215, 179, 255, 0.64);
-      color: #432560;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--orange);
+      border-color: rgba(255, 176, 92, 0.66);
+      color: #64350e;
     }
 
     .guess-tile.guess-5,
     .selector-chip.guess-5,
     .selector-chip.guess-5.active,
     .selector-chip.guess-5.pending {
-      background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--orange);
-      border-color: rgba(255, 193, 140, 0.64);
-      color: #653819;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 28%), var(--green);
+      border-color: rgba(139, 240, 111, 0.68);
+      color: #183f10;
     }
 
     .guess-tile.exact {
@@ -505,9 +505,9 @@
 
     .victory-toast {
       min-width: 250px;
-      background: rgba(14, 18, 34, 0.94);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.36);
+      background: linear-gradient(180deg, rgba(106, 170, 100, 0.96), rgba(69, 130, 66, 0.96));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.32);
     }
 
     .victory-toast strong,
@@ -521,7 +521,7 @@
     }
 
     .victory-toast span {
-      color: #d6e4ff;
+      color: rgba(245, 255, 247, 0.9);
       font-size: 0.9rem;
       font-weight: 700;
     }
@@ -551,8 +551,7 @@
       opacity: 1;
     }
 
-    #resultWord,
-    #resultLastGuess {
+    #resultWord {
       white-space: nowrap;
       letter-spacing: 0.08em;
       font-weight: 800;
@@ -1010,17 +1009,15 @@
       flex-wrap: wrap;
     }
 
-    .result-overlay .modal {
-      animation: resultIn 360ms cubic-bezier(.2,.8,.2,1);
-    }
-
     .result-overlay {
+      animation: overlayFadeIn 260ms ease;
       overflow-y: auto;
       align-items: start;
       padding: max(12px, env(safe-area-inset-top, 0px)) 14px max(18px, env(safe-area-inset-bottom, 0px));
     }
 
     .result-overlay .modal {
+      animation: resultIn 430ms cubic-bezier(.18,.82,.22,1);
       margin: auto 0;
       width: min(560px, 100%);
       max-height: min(88vh, 820px);
@@ -1193,11 +1190,20 @@
     @keyframes resultIn {
       0% {
         opacity: 0;
-        transform: translateY(32px) scale(0.98);
+        transform: translateY(38px) scale(0.985);
       }
       100% {
         opacity: 1;
         transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes overlayFadeIn {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
       }
     }
 
@@ -1767,20 +1773,12 @@
           <span id="resultMatches"></span>
         </div>
         <div class="detail-card">
-          <strong>Last Guess</strong>
-          <span id="resultLastGuess"></span>
-        </div>
-        <div class="detail-card">
           <strong>Next Daily Word</strong>
           <span id="resultNextDaily">Not active</span>
         </div>
       </div>
-      <div class="example-block">
-        <h3>Share Or Review</h3>
-        <p id="resultShareCopy">Share a spoiler-free summary, or jump back to the board if you want to study the curve again.</p>
-      </div>
       <div class="modal-actions">
-        <button id="shareResult" class="action-btn" type="button">Share Result</button>
+        <button id="shareResult" class="action-btn" type="button">Share</button>
         <button id="openMainMenu" class="action-btn" type="button" hidden>Main Menu</button>
         <button id="backToBoard" class="action-btn" type="button">Back To Board</button>
         <button id="playAgain" class="action-btn" type="button">Play Again</button>
@@ -1857,8 +1855,10 @@
         <div class="stat-card"><strong>Played</strong><span id="statsPlayed">0</span></div>
         <div class="stat-card"><strong>Overall Wins</strong><span id="statsOverallWins">0</span></div>
         <div class="stat-card"><strong>Win %</strong><span id="statsWinRate">0%</span></div>
+        <div class="stat-card"><strong>Average Solve</strong><span id="statsAverageSolve">0.0</span></div>
         <div class="stat-card"><strong>Current Streak</strong><span id="statsStreak">0</span></div>
         <div class="stat-card"><strong>Best Streak</strong><span id="statsBestStreak">0</span></div>
+        <div class="stat-card"><strong>Daily Wins</strong><span id="statsDailyWins">0</span></div>
         <div class="stat-card"><strong>Daily Win Streak</strong><span id="statsDailyStreak">0</span></div>
       </div>
       <div class="example-block">
@@ -1880,7 +1880,7 @@
           <strong>Answer Word</strong>
           <input id="customWordInput" class="custom-input" type="text" maxlength="12" placeholder="Type 3 to 12 letters">
         </label>
-        <p id="customWordNote" class="custom-note">Custom games can use any 3 to 12 letters, and you can hold backslash for 5 seconds to add one blank graph point.</p>
+        <p id="customWordNote" class="custom-note">Custom games can use any 3 to 12 letters.</p>
         <div id="manualCopyWrap" class="custom-field" hidden>
           <strong>Copy This Link</strong>
           <input id="manualCopyLink" class="manual-link-box" type="text" readonly>
@@ -1888,9 +1888,23 @@
       </div>
       <div class="modal-actions">
         <button id="copyCustomLink" class="action-btn" type="button">Copy Link</button>
+        <button id="setGhostLetters" class="action-btn" type="button" hidden>Set Blank Points</button>
         <button id="showManualLink" class="action-btn" type="button">Show Manual Link</button>
         <button id="playCustomNow" class="action-btn" type="button">Play Here</button>
         <button id="closeCustom" class="action-btn" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ghostConfigOverlay" class="overlay" hidden>
+    <div class="modal">
+      <h2>Set Blank Points</h2>
+      <p>Choose what each secret point should look like on the graph.</p>
+      <div id="ghostConfigWrap" class="custom-field">
+        <div id="ghostConfigList" class="dist-list"></div>
+      </div>
+      <div class="modal-actions">
+        <button id="closeGhostConfig" class="action-btn" type="button">Done</button>
       </div>
     </div>
   </div>
@@ -1928,6 +1942,7 @@
   <script src="words.js?v=20260505"></script>
   <script>
     const svg = document.getElementById("graph");
+    const graphCard = document.querySelector(".graph-card");
     const toastLayer = document.getElementById("toastLayer");
     const board = document.getElementById("board");
     const boardShell = document.getElementById("boardShell");
@@ -1968,9 +1983,7 @@
     const resultTries = document.getElementById("resultTries");
     const resultMode = document.getElementById("resultMode");
     const resultMatches = document.getElementById("resultMatches");
-    const resultLastGuess = document.getElementById("resultLastGuess");
     const resultNextDaily = document.getElementById("resultNextDaily");
-    const resultShareCopy = document.getElementById("resultShareCopy");
     const shareResultButton = document.getElementById("shareResult");
     const openMainMenuButton = document.getElementById("openMainMenu");
     const backToBoardButton = document.getElementById("backToBoard");
@@ -1989,19 +2002,26 @@
     const statsPlayed = document.getElementById("statsPlayed");
     const statsOverallWins = document.getElementById("statsOverallWins");
     const statsWinRate = document.getElementById("statsWinRate");
+    const statsAverageSolve = document.getElementById("statsAverageSolve");
     const statsStreak = document.getElementById("statsStreak");
     const statsBestStreak = document.getElementById("statsBestStreak");
+    const statsDailyWins = document.getElementById("statsDailyWins");
     const statsDailyStreak = document.getElementById("statsDailyStreak");
     const statsDistribution = document.getElementById("statsDistribution");
     const customOverlay = document.getElementById("customOverlay");
     const customWordInput = document.getElementById("customWordInput");
+    const ghostConfigOverlay = document.getElementById("ghostConfigOverlay");
+    const ghostConfigWrap = document.getElementById("ghostConfigWrap");
+    const ghostConfigList = document.getElementById("ghostConfigList");
     const customWordNote = document.getElementById("customWordNote");
     const manualCopyWrap = document.getElementById("manualCopyWrap");
     const manualCopyLink = document.getElementById("manualCopyLink");
     const copyCustomLinkButton = document.getElementById("copyCustomLink");
+    const setGhostLettersButton = document.getElementById("setGhostLetters");
     const showManualLinkButton = document.getElementById("showManualLink");
     const playCustomNowButton = document.getElementById("playCustomNow");
     const closeCustomButton = document.getElementById("closeCustom");
+    const closeGhostConfigButton = document.getElementById("closeGhostConfig");
     const confirmOverlay = document.getElementById("confirmOverlay");
     const confirmTitle = document.getElementById("confirmTitle");
     const confirmCopy = document.getElementById("confirmCopy");
@@ -2034,12 +2054,12 @@
     const DAILY_STORAGE_PREFIX = "curvele-daily-";
     const STATS_STORAGE_KEY = "curvele-stats-v1";
     const GUESS_COLORS = [
-      { label: "Guess 1", color: "#89cbff", note: "blue" },
-      { label: "Guess 2", color: "#ff8d98", note: "red" },
-      { label: "Guess 3", color: "#ffe18a", note: "yellow" },
-      { label: "Guess 4", color: "#92f2bc", note: "green" },
-      { label: "Guess 5", color: "#d7b3ff", note: "purple" },
-      { label: "Guess 6", color: "#ffc18c", note: "orange" }
+      { label: "Guess 1", color: "#72b9ff", note: "blue" },
+      { label: "Guess 2", color: "#ff7a8b", note: "red" },
+      { label: "Guess 3", color: "#ffd84f", note: "yellow" },
+      { label: "Guess 4", color: "#c99fff", note: "purple" },
+      { label: "Guess 5", color: "#ffb05c", note: "orange" },
+      { label: "Guess 6", color: "#8bf06f", note: "green" }
     ];
     const WORDS = [
       "ANGLE", "BRAIN", "CABIN", "CHIME", "CURVE", "DREAM", "FLARE", "GLASS",
@@ -2126,6 +2146,7 @@
       wordLength: DEFAULT_WORD_LENGTH,
       linkedCustomWord: "",
       linkedCustomLocked: false,
+      customGhostLetters: [],
       tutorialStepIndex: -1,
       currentDailyKey: "",
       dailyCompletedKey: "",
@@ -2153,6 +2174,7 @@
         maxStreak: 0,
         dailyWins: 0,
         dailyPlayed: 0,
+        totalSolveSteps: 0,
         distribution: Array(MAX_GUESSES).fill(0)
       };
       try {
@@ -2206,17 +2228,89 @@
       return customWordToInternal(customWordInput.value);
     }
 
+    function getGhostIndexes(word = getCustomWordInputValue()) {
+      return word.split("").reduce((list, char, index) => {
+        if (char === CUSTOM_GHOST_CHAR) {
+          list.push(index);
+        }
+        return list;
+      }, []);
+    }
+
+    function getDefaultGhostLetter(word, ghostIndex) {
+      const baseValues = computeBaseGhostValues(word);
+      return String.fromCharCode(65 + ((Math.round(clampValue(baseValues[ghostIndex] ?? 12.5, 0, 25)) + 1) % 26));
+    }
+
+    function ensureGhostLetterDefaults(word = getCustomWordInputValue()) {
+      const ghostIndexes = getGhostIndexes(word);
+      if (!ghostIndexes.length) {
+        state.customGhostLetters = [];
+        return [];
+      }
+      state.customGhostLetters = ghostIndexes.map((ghostIndex, order) => {
+        const existing = state.customGhostLetters[order];
+        return existing || getDefaultGhostLetter(word, ghostIndex);
+      });
+      return ghostIndexes;
+    }
+
+    function renderGhostConfig(word = getCustomWordInputValue()) {
+      const ghostIndexes = ensureGhostLetterDefaults(word);
+      const hasGhost = ghostIndexes.length > 0;
+      setGhostLettersButton.hidden = !hasGhost;
+      if (!hasGhost) {
+        ghostConfigOverlay.hidden = true;
+        ghostConfigList.innerHTML = "";
+        return;
+      }
+      const rows = ghostIndexes.map((ghostIndex, order) => `
+        <div class="dist-row">
+          <span>Blank Point ${order + 1}</span>
+          <div class="dist-bar" style="padding:0; background:transparent;">
+            <input class="custom-input ghost-letter-input" data-ghost-order="${order}" maxlength="1" value="${state.customGhostLetters[order] || ""}" placeholder="A">
+          </div>
+          <span>Spot ${ghostIndex + 1}</span>
+        </div>
+      `);
+      if (ghostIndexes.length === 1) {
+        rows.push(`
+          <div class="dist-row">
+            <span>Blank Point 2</span>
+            <div class="dist-bar"><div class="dist-fill" style="width:100%; opacity:0.2;"></div></div>
+            <span>X</span>
+          </div>
+        `);
+      }
+      ghostConfigList.innerHTML = rows.join("");
+      ghostConfigList.querySelectorAll("[data-ghost-order]").forEach((inputEl) => {
+        const syncGhostLetter = (event) => {
+          const order = Number(event.target.dataset.ghostOrder);
+          const nextLetter = event.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 1)
+            || state.customGhostLetters[order]
+            || getDefaultGhostLetter(word, ghostIndexes[order]);
+          state.customGhostLetters[order] = nextLetter;
+          event.target.value = nextLetter;
+          initializeGhostDisplayValues(word);
+          renderGraph();
+        };
+        inputEl.addEventListener("input", syncGhostLetter);
+        inputEl.addEventListener("blur", syncGhostLetter);
+      });
+    }
+
     function updateCustomWordNote(value = "") {
       manualCopyWrap.hidden = true;
+      renderGhostConfig(value);
       customWordNote.classList.remove("recommended", "caution");
-      if (value.length >= 5 && value.length <= 7) {
+      if (value.length >= 4 && value.length <= 6) {
         customWordNote.textContent = `${value.length} characters: recommended. This size usually feels best to play.`;
         customWordNote.classList.add("recommended");
       } else if (value.length >= MIN_CUSTOM_WORD_LENGTH) {
-        customWordNote.textContent = `${value.length} characters: not recommended. It will still work, but 5 to 7 characters usually plays better.`;
+        customWordNote.textContent = `${value.length} characters: not recommended. It will still work, but 4 to 6 characters usually plays better.`;
         customWordNote.classList.add("caution");
       } else {
-        customWordNote.textContent = "Custom games can use any 3 to 12 letters, and you can hold backslash for 5 seconds to add one blank graph point.";
+        customWordNote.textContent = "Custom games can use any 3 to 12 letters.";
       }
     }
 
@@ -2239,6 +2333,15 @@
       state.ghostAnimationState = null;
     }
 
+    function isGraphCardVisible() {
+      if (!graphCard) {
+        return false;
+      }
+      const rect = graphCard.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+      return rect.bottom > 0 && rect.top < viewportHeight;
+    }
+
     function computeBaseGhostValues(word) {
       const values = word.split("").map((char) => toValue(char));
       return values.map((value, index) => {
@@ -2258,7 +2361,23 @@
     }
 
     function initializeGhostDisplayValues(word) {
-      state.ghostDisplayValues = hasGhostCharacter(word) ? computeBaseGhostValues(word) : [];
+      if (!hasGhostCharacter(word)) {
+        state.ghostDisplayValues = [];
+        return;
+      }
+      ensureGhostLetterDefaults(word);
+      const ghostIndexes = getGhostIndexes(word);
+      const baseValues = computeBaseGhostValues(word);
+      state.ghostDisplayValues = word.split("").map((char, index) => {
+        if (char !== CUSTOM_GHOST_CHAR) {
+          return baseValues[index];
+        }
+        const ghostOrder = ghostIndexes.indexOf(index);
+        if (ghostOrder !== -1 && state.customGhostLetters[ghostOrder]) {
+          return toValue(state.customGhostLetters[ghostOrder]);
+        }
+        return baseValues[index];
+      });
     }
 
     function currentVisibleGhostLetters() {
@@ -2317,10 +2436,22 @@
         renderGraph();
         return true;
       }
-      const duration = 3200;
+      if (!isGraphCardVisible()) {
+        state.ghostDisplayValues = toValues;
+        renderGraph();
+        return true;
+      }
+      const duration = 12000;
       const startAt = performance.now();
       state.ghostAnimationState = { fromValues, toValues, startAt, duration };
       const tick = (now) => {
+        if (!isGraphCardVisible()) {
+          state.ghostDisplayValues = toValues;
+          state.ghostAnimationFrame = null;
+          state.ghostAnimationState = null;
+          renderGraph();
+          return;
+        }
         const elapsed = now - startAt;
         const progress = clampValue(elapsed / duration, 0, 1);
         const eased = progress * progress * (3 - 2 * progress);
@@ -2653,17 +2784,14 @@
         ${guessMarkup}
         <path d="${targetPath}" fill="none" stroke="${answerOutline}" stroke-width="12" stroke-linecap="round" opacity="${document.body.classList.contains("light-mode") ? "0.34" : "0.22"}" />
         <path d="${targetPath}" fill="none" stroke="${getComputedStyle(document.documentElement).getPropertyValue("--white-line").trim() || "#ffffff"}" stroke-width="8" stroke-linecap="round" />
-        ${winningSegments.map((segment, index) => segment ? `<path d="${segment}" fill="none" stroke="url(#victoryRainbow)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" style="--path-length: 100; ${state.reducedMotion ? "opacity: 1;" : `stroke-dasharray: var(--path-length); stroke-dashoffset: var(--path-length); animation: drawLineVictory ${victoryDurations[index]}ms cubic-bezier(.18,.08,.2,1) ${victoryDelays[index]}ms forwards;`}" />` : "" ).join("")}
-        ${winningPoints.map((point, index) => winningSegments.length ? `<circle cx="${point.x}" cy="${point.y}" r="7" fill="#ffffff" style="${state.reducedMotion ? "opacity: 1;" : `opacity: 0; animation: drawLineVictory 260ms ease ${victoryPointDelays[index]}ms forwards, rainbowFlash 1200ms linear ${victoryPointDelays[index]}ms infinite;`}" stroke="var(--point-stroke)" stroke-width="3" />` : "").join("")}
+        ${winningSegments.map((segment, index) => segment ? `<path d="${segment}" fill="none" stroke="url(#victoryGreen)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" style="--path-length: 100; ${state.reducedMotion ? "opacity: 1;" : `stroke-dasharray: var(--path-length); stroke-dashoffset: var(--path-length); animation: drawLineVictory ${victoryDurations[index]}ms cubic-bezier(.18,.08,.2,1) ${victoryDelays[index]}ms forwards;`}" />` : "" ).join("")}
+        ${winningPoints.map((point, index) => winningSegments.length ? `<circle cx="${point.x}" cy="${point.y}" r="8" fill="#6aaa64" style="${state.reducedMotion ? "opacity: 1;" : `opacity: 0; animation: drawLineVictory 260ms ease ${victoryPointDelays[index]}ms forwards;`}" stroke="#ffffff" stroke-width="3" />` : "").join("")}
         ${targetPoints.map((point, index) => `<circle cx="${point.x}" cy="${point.y}" r="7" fill="${matchedPositions[index] ? "#6aaa64" : "#ffffff"}" stroke="var(--point-stroke)" stroke-width="3" />`).join("")}
         <defs>
-          <linearGradient id="victoryRainbow" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#ff6b7a" />
-            <stop offset="18%" stop-color="#ffb347" />
-            <stop offset="36%" stop-color="#ffe066" />
-            <stop offset="56%" stop-color="#4dff88" />
-            <stop offset="76%" stop-color="#57c7ff" />
-            <stop offset="100%" stop-color="#b88cff" />
+          <linearGradient id="victoryGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#b7f0c5" />
+            <stop offset="45%" stop-color="#6aaa64" />
+            <stop offset="100%" stop-color="#3f8f4c" />
           </linearGradient>
         </defs>
       `;
@@ -2859,13 +2987,16 @@
       const played = stats.played || 0;
       const wins = stats.wins || 0;
       const winRate = played ? Math.round((wins / played) * 100) : 0;
+      const averageSolve = wins ? (stats.totalSolveSteps || 0) / wins : 0;
       const maxDist = Math.max(1, ...stats.distribution);
 
       statsPlayed.textContent = String(played);
       statsOverallWins.textContent = String(wins);
       statsWinRate.textContent = `${winRate}%`;
+      statsAverageSolve.textContent = averageSolve ? averageSolve.toFixed(1) : "0.0";
       statsStreak.textContent = String(stats.streak || 0);
       statsBestStreak.textContent = String(stats.maxStreak || 0);
+      statsDailyWins.textContent = String(stats.dailyWins || 0);
       statsDailyStreak.textContent = String(getDailyWinStreak());
       statsDistribution.innerHTML = stats.distribution.map((count, index) => `
         <div class="dist-row">
@@ -2886,6 +3017,7 @@
         stats.wins += 1;
         stats.streak += 1;
         stats.maxStreak = Math.max(stats.maxStreak, stats.streak);
+        stats.totalSolveSteps += state.guesses.length;
         if (state.mode === "daily") {
           stats.dailyWins += 1;
         }
@@ -2921,19 +3053,27 @@
       return `Curvele ${modeLabel} ${resultLabel}\n${rows}\n${window.location.href}`;
     }
 
-    function encodeCustomWord(word) {
-      return word
+    function encodeCustomWord(word, ghostLetters = state.customGhostLetters) {
+      const encodedWord = word
         .split("")
         .map((char, index) => {
           const value = char === CUSTOM_GHOST_CHAR ? 26 : toValue(char);
           return ((value + 7 + index) % 36).toString(36).padStart(2, "0");
         })
         .join("");
+      const ghostIndexes = getGhostIndexes(word);
+      if (!ghostIndexes.length) {
+        return encodedWord;
+      }
+      const suffix = ghostIndexes.map((_, order) => (ghostLetters[order] || getDefaultGhostLetter(word, ghostIndexes[order])).toLowerCase()).join("");
+      return `${encodedWord}~${suffix}`;
     }
 
     function decodeCustomToken(token) {
-      if (!token || token.length < MIN_CUSTOM_WORD_LENGTH * 2 || token.length % 2 !== 0) return "";
-      const chunks = token.match(/.{2}/g) || [];
+      if (!token || token.length < MIN_CUSTOM_WORD_LENGTH * 2) return { word: "", ghostLetters: [] };
+      const [coreToken, suffix = ""] = token.split("~");
+      if (coreToken.length % 2 !== 0) return { word: "", ghostLetters: [] };
+      const chunks = coreToken.match(/.{2}/g) || [];
       const letters = chunks.map((chunk, index) => {
         const value = parseInt(chunk, 36);
         if (Number.isNaN(value) || value < 0 || value > 35) return "";
@@ -2948,9 +3088,13 @@
       });
       const word = letters.join("");
       if (!new RegExp(`^[A-Z${CUSTOM_GHOST_CHAR.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}]{${MIN_CUSTOM_WORD_LENGTH},${MAX_CUSTOM_WORD_LENGTH}}$`).test(word)) {
-        return "";
+        return { word: "", ghostLetters: [] };
       }
-      return word;
+      const ghostCount = getGhostIndexes(word).length;
+      const ghostLetters = suffix
+        ? suffix.slice(0, ghostCount).toUpperCase().split("").filter((char) => /^[A-Z]$/.test(char))
+        : [];
+      return { word, ghostLetters };
     }
 
     function customHashForWord(word) {
@@ -2962,11 +3106,12 @@
     }
 
     function readCustomWordFromUrl() {
-      const newMatch = window.location.hash.match(/p2=([0-9a-z]+)/i);
+      const newMatch = window.location.hash.match(/p2=([^&]+)/i);
       if (newMatch) {
         const decoded = decodeCustomToken(decodeURIComponent(newMatch[1] || ""));
-        if (decoded.length >= MIN_CUSTOM_WORD_LENGTH && decoded.length <= MAX_CUSTOM_WORD_LENGTH) {
-          return decoded;
+        if (decoded.word.length >= MIN_CUSTOM_WORD_LENGTH && decoded.word.length <= MAX_CUSTOM_WORD_LENGTH) {
+          state.customGhostLetters = decoded.ghostLetters || [];
+          return decoded.word;
         }
       }
       const oldMatch = window.location.hash.match(/p=([0-9a-z]+)/i);
@@ -3054,9 +3199,11 @@
     }
 
     function showVictoryBanner() {
+      const praise = ["Genius", "Magnificent", "Impressive", "Splendid", "Great", "Close One"];
+      const label = praise[Math.max(0, Math.min(praise.length - 1, state.guesses.length - 1))];
       const toast = document.createElement("div");
       toast.className = "toast victory-toast";
-      toast.innerHTML = "<strong>Perfect curve</strong><span>Take a second to watch the board finish the reveal</span>";
+      toast.innerHTML = `<strong>${label}</strong><span>Solved in ${state.guesses.length}/${MAX_GUESSES}</span>`;
       toastLayer.appendChild(toast);
       setTimeout(() => {
         toast.remove();
@@ -3235,27 +3382,26 @@
       const latestGuess = state.guesses[state.guesses.length - 1];
       const exactMatches = latestGuess ? countExactMatches(latestGuess.word, state.secret) : 0;
       state.resultShowsDailyCountdown = isTodayDailyCompleted();
-      resultTitle.textContent = mode === "reset" ? "Round Reset" : (win ? "You Solved It" : "Round Over");
-      resultText.textContent = mode === "reset"
-        ? `You started a ${state.pendingResetTargetMode === "unlimited" ? "new unlimited round" : "new round"} before finishing this one. Here is the final look at the previous answer and your latest guess.`
-        : isTodayDailyCompleted()
-        ? `Next daily word in ${formatCountdown(getNextDailyCountdownMs())}.`
+      const modeName = state.mode === "daily" ? "Daily" : state.mode === "custom" ? "Custom" : "Unlimited";
+      resultTitle.textContent = mode === "reset"
+        ? "Round Reset"
         : win
-        ? `Nice work${state.playerName ? `, ${state.playerName}` : ""}. The board finished the curve, and your guess matched the hidden word.`
-        : `${state.playerName ? `${state.playerName}, ` : ""}the board finished revealing the round, and you used all six tries before landing on the correct word.`;
-      resultWord.textContent = `The word was ${visibleSecretWord()}.`;
+          ? `Solved in ${state.guesses.length}/${MAX_GUESSES}`
+          : visibleSecretWord();
+      resultText.textContent = mode === "reset"
+        ? `You started a ${state.pendingResetTargetMode === "unlimited" ? "new unlimited round" : "new round"} before finishing this one.`
+        : win
+          ? `${modeName} puzzle complete.`
+          : "The answer is shown below.";
+      resultWord.textContent = win ? visibleSecretWord() : `The word was ${visibleSecretWord()}.`;
       resultTries.textContent = `${state.guesses.length} of ${MAX_GUESSES}`;
       resultMode.textContent = mode === "reset"
         ? `${state.mode === "daily" ? "Daily" : state.mode === "custom" ? "Custom" : "Unlimited"} Reset`
         : `${state.mode === "daily" ? "Daily" : state.mode === "custom" ? "Custom" : "Unlimited"} ${win ? "Win" : "Loss"}`;
-      resultMatches.textContent = `${exactMatches} of ${state.wordLength} points matched on your last guess`;
-      resultLastGuess.textContent = latestGuess ? displayWord(latestGuess.word) : "No final guess";
+      resultMatches.textContent = `${exactMatches} of ${state.wordLength} points matched`;
       resultNextDaily.textContent = formatCountdown(getNextDailyCountdownMs());
-      resultShareCopy.textContent = state.mode === "custom"
-        ? "Share this result, or jump back to the board to keep studying how the custom curve matched up."
-        : "Share a spoiler-free summary, or jump back to the board if you want to study the curve again.";
       resultCaption.textContent = latestGuess
-        ? `The white line is the answer. The colored line shows your final guess, and any green points mark exact position matches.`
+        ? `The white line is the answer. Green points mark exact matches.`
         : `The white line is the answer graph for this round.`;
       backToBoardButton.hidden = false;
       openMainMenuButton.hidden = !(state.mode === "custom" && state.linkedCustomLocked && win);
@@ -3269,6 +3415,24 @@
       } else {
         stopDailyCountdown();
       }
+    }
+
+    function getWinRevealDurationMs() {
+      if (state.reducedMotion) {
+        return 900;
+      }
+      const segmentCount = Math.max(0, state.wordLength - 1);
+      if (!segmentCount) {
+        return 1200;
+      }
+      const victoryDurations = Array.from({ length: segmentCount }, (_, index) => Math.max(520, 1320 - index * 180));
+      const victoryDelays = victoryDurations.map((_, index) => {
+        if (index === 0) return 0;
+        return victoryDurations.slice(0, index).reduce((sum, value) => sum + value - 90, 0);
+      });
+      const lastIndex = segmentCount - 1;
+      const lastSegmentEnd = victoryDelays[lastIndex] + victoryDurations[lastIndex];
+      return lastSegmentEnd + 240;
     }
 
     function visibleSecretWord() {
@@ -3323,6 +3487,9 @@
       state.customWord = options.customWord || (mode === "custom" ? state.customWord : "");
       state.linkedCustomWord = options.linkedCustomWord || state.linkedCustomWord;
       state.linkedCustomLocked = Boolean(options.linkedCustomLocked);
+      if (mode !== "custom") {
+        state.customGhostLetters = [];
+      }
       state.secret = options.secret || randomWord(mode);
       state.wordLength = state.secret.length || DEFAULT_WORD_LENGTH;
       input.maxLength = state.wordLength;
@@ -3377,10 +3544,13 @@
       } else {
         showToast("Round over");
       }
+      const resultDelay = win
+        ? getWinRevealDurationMs() + (state.reducedMotion ? 120 : 220)
+        : (state.reducedMotion ? 900 : 2200);
       state.resultTimer = setTimeout(() => {
         state.resultTimer = null;
         showResult(win);
-      }, state.reducedMotion ? (win ? 1000 : 900) : (win ? 4100 : 2400));
+      }, resultDelay);
     }
 
     function submitGuess() {
@@ -3640,6 +3810,7 @@
     closeCustomButton.addEventListener("click", () => {
       clearCustomGhostHold();
       customOverlay.hidden = true;
+      ghostConfigOverlay.hidden = true;
       manualCopyWrap.hidden = true;
       input.focus();
     });
@@ -3733,6 +3904,7 @@
       }
       customOverlay.hidden = true;
       startOverlay.hidden = true;
+      initializeGhostDisplayValues(word);
       resetGame("custom", { secret: word, customWord: word, linkedCustomLocked: false });
       input.focus();
     });
@@ -3766,6 +3938,17 @@
       manualCopyLink.focus();
       manualCopyLink.select();
       showToast("Manual copy link ready");
+    });
+    setGhostLettersButton.addEventListener("click", () => {
+      if (setGhostLettersButton.hidden) {
+        return;
+      }
+      renderGhostConfig(getCustomWordInputValue());
+      ghostConfigOverlay.hidden = false;
+    });
+    closeGhostConfigButton.addEventListener("click", () => {
+      ghostConfigOverlay.hidden = true;
+      customWordInput.focus();
     });
     customWordInput.addEventListener("keyup", (event) => {
       if (event.key === "\\") {
