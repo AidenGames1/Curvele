@@ -1231,6 +1231,15 @@
       }
     }
 
+    @keyframes fadeLineIn {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
     @keyframes toggleLineIn {
       0% {
         opacity: 0.12;
@@ -1882,6 +1891,10 @@
           <strong>Answer Word</strong>
           <input id="customWordInput" class="custom-input" type="text" maxlength="12" placeholder="Type 3 to 12 letters">
         </label>
+        <label class="custom-field">
+          <strong>Guess Count</strong>
+          <input id="customGuessCountInput" class="custom-input" type="number" min="1" max="12" value="6" inputmode="numeric">
+        </label>
         <p id="customWordNote" class="custom-note">Custom games can use any 3 to 12 letters.</p>
         <div id="manualCopyWrap" class="custom-field" hidden>
           <strong>Copy This Link</strong>
@@ -1940,8 +1953,8 @@
     </div>
   </div>
 
-  <script src="guess-words.js?v=20260505"></script>
-  <script src="words.js?v=20260505"></script>
+  <script src="guess-words.js?v=20260511"></script>
+  <script src="words.js?v=20260511"></script>
   <script>
     const svg = document.getElementById("graph");
     const graphCard = document.querySelector(".graph-card");
@@ -2012,6 +2025,7 @@
     const statsDistribution = document.getElementById("statsDistribution");
     const customOverlay = document.getElementById("customOverlay");
     const customWordInput = document.getElementById("customWordInput");
+    const customGuessCountInput = document.getElementById("customGuessCountInput");
     const ghostConfigOverlay = document.getElementById("ghostConfigOverlay");
     const ghostConfigWrap = document.getElementById("ghostConfigWrap");
     const ghostConfigList = document.getElementById("ghostConfigList");
@@ -2044,6 +2058,8 @@
     const PADDING_Y = 30;
     const GRID_LINES = 5;
     const MAX_GUESSES = 6;
+    const MIN_CUSTOM_GUESSES = 1;
+    const MAX_CUSTOM_GUESSES = 12;
     const DEFAULT_WORD_LENGTH = 5;
     const MIN_CUSTOM_WORD_LENGTH = 3;
     const MAX_CUSTOM_WORD_LENGTH = 12;
@@ -2094,11 +2110,14 @@
       return [];
     }
 
-    const ANSWER_WORDS = (normalizeWordSource(window.CURVELE_WORDS).length
-      ? normalizeWordSource(window.CURVELE_WORDS)
+    const NORMALIZED_ANSWER_SOURCE = normalizeWordSource(window.CURVELE_WORDS);
+    const NORMALIZED_GUESS_SOURCE = normalizeWordSource(window.CURVELE_GUESS_WORDS);
+    const HAS_FULL_GUESS_LIST = NORMALIZED_GUESS_SOURCE.length >= 5000;
+    const ANSWER_WORDS = (NORMALIZED_ANSWER_SOURCE.length
+      ? NORMALIZED_ANSWER_SOURCE
       : WORDS).filter((word) => !BANNED_WORDS.has(word));
-    const GUESS_WORDS = (normalizeWordSource(window.CURVELE_GUESS_WORDS).length
-      ? normalizeWordSource(window.CURVELE_GUESS_WORDS)
+    const GUESS_WORDS = (NORMALIZED_GUESS_SOURCE.length
+      ? NORMALIZED_GUESS_SOURCE
       : ANSWER_WORDS).filter((word) => !BANNED_WORDS.has(word));
     const ALLOWED_WORDS = [...new Set(GUESS_WORDS.concat(ANSWER_WORDS, EASTER_WORD))];
     const KEYBOARD_LAYOUTS = {
@@ -2145,6 +2164,7 @@
       answerHackVisible: false,
       mode: "daily",
       customWord: "",
+      customGuessLimit: MAX_GUESSES,
       wordLength: DEFAULT_WORD_LENGTH,
       linkedCustomWord: "",
       linkedCustomLocked: false,
@@ -2163,6 +2183,7 @@
       ghostAnimationState: null,
       lastAnimatedGuessDelay: 0,
       stats: loadStats(),
+      wordListLimited: !HAS_FULL_GUESS_LIST,
       allowedWords: new Set(ALLOWED_WORDS),
       fullAllowedWords: new Set(ALLOWED_WORDS),
       answers: [...ANSWER_WORDS]
@@ -2314,6 +2335,18 @@
       } else {
         customWordNote.textContent = "Custom games can use any 3 to 12 letters.";
       }
+    }
+
+    function clampCustomGuessLimit(value) {
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed)) {
+        return MAX_GUESSES;
+      }
+      return Math.max(MIN_CUSTOM_GUESSES, Math.min(MAX_CUSTOM_GUESSES, Math.round(parsed)));
+    }
+
+    function getGuessLimit(mode = state.mode) {
+      return mode === "custom" ? clampCustomGuessLimit(state.customGuessLimit) : MAX_GUESSES;
     }
 
     function clearCustomGhostHold() {
@@ -2724,6 +2757,7 @@
       const answerOutline = document.body.classList.contains("light-mode") ? "#1c2a44" : "rgba(0,0,0,0.32)";
       const winningGuess = state.wonLastRound ? state.guesses[state.guesses.length - 1] : null;
       const winningPoints = winningGuess ? buildPoints(winningGuess.word) : [];
+      const winningPath = winningPoints.length ? pathFromPoints(winningPoints) : "";
       const winningSegments = winningPoints.length
         ? Array.from({ length: Math.max(0, winningPoints.length - 1) }, (_, index) => pathSegmentFromPoints(winningPoints, index))
         : [];
@@ -2777,6 +2811,9 @@
         if (index === 0) return 0;
         return victoryDelays[Math.max(0, index - 1)] + victoryDurations[Math.max(0, index - 1)] - 60;
       });
+      const lastVictoryDelay = winningSegments.length
+        ? victoryDelays[winningSegments.length - 1] + victoryDurations[winningSegments.length - 1] - 80
+        : 0;
 
       const axisFont = state.isTouchDevice ? 28 : 20;
       svg.innerHTML = `
@@ -2786,6 +2823,7 @@
         ${guessMarkup}
         <path d="${targetPath}" fill="none" stroke="${answerOutline}" stroke-width="12" stroke-linecap="round" opacity="${document.body.classList.contains("light-mode") ? "0.34" : "0.22"}" />
         <path d="${targetPath}" fill="none" stroke="${getComputedStyle(document.documentElement).getPropertyValue("--white-line").trim() || "#ffffff"}" stroke-width="8" stroke-linecap="round" />
+        ${winningPath ? `<path d="${winningPath}" fill="none" stroke="url(#victoryGreen)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" style="${state.reducedMotion ? "opacity: 1;" : `opacity: 0; animation: fadeLineIn 220ms ease ${lastVictoryDelay}ms forwards;`}" />` : ""}
         ${winningSegments.map((segment, index) => segment ? `<path d="${segment}" fill="none" stroke="url(#victoryGreen)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" style="--path-length: 100; ${state.reducedMotion ? "opacity: 1;" : `stroke-dasharray: var(--path-length); stroke-dashoffset: var(--path-length); animation: drawLineVictory ${victoryDurations[index]}ms cubic-bezier(.18,.08,.2,1) ${victoryDelays[index]}ms forwards;`}" />` : "" ).join("")}
         ${winningPoints.map((point, index) => winningSegments.length ? `<circle cx="${point.x}" cy="${point.y}" r="8" fill="#6aaa64" style="${state.reducedMotion ? "opacity: 1;" : `opacity: 0; animation: drawLineVictory 260ms ease ${victoryPointDelays[index]}ms forwards;`}" stroke="#ffffff" stroke-width="3" />` : "").join("")}
         ${targetPoints.map((point, index) => `<circle cx="${point.x}" cy="${point.y}" r="7" fill="${matchedPositions[index] ? "#6aaa64" : "#ffffff"}" stroke="var(--point-stroke)" stroke-width="3" />`).join("")}
@@ -2804,7 +2842,7 @@
 
     function renderBoard() {
       const rows = [];
-      for (let i = 0; i < MAX_GUESSES; i += 1) {
+      for (let i = 0; i < getGuessLimit(); i += 1) {
         const guess = state.guesses[i];
         const activeRow = i === state.guesses.length && !state.isOver;
         const preview = activeRow ? sanitizeWord(input.value) : "";
@@ -2891,7 +2929,7 @@
         return;
       }
       if (state.mode === "custom") {
-        status.textContent = `Custom challenge is on. Solve the ${state.wordLength}-letter graph in six tries.`;
+        status.textContent = `Custom challenge is on. Solve the ${state.wordLength}-letter graph in ${getGuessLimit()} tries.`;
         return;
       }
       status.textContent = isTodayDailyCompleted()
@@ -3048,7 +3086,7 @@
 
     function buildShareText() {
       const modeLabel = state.mode === "daily" ? `Daily ${getCurrentDailyKey()}` : state.mode === "custom" ? `Custom ${state.wordLength}` : "Unlimited";
-      const resultLabel = state.wonLastRound ? `${state.guesses.length}/${MAX_GUESSES}` : "X/6";
+      const resultLabel = state.wonLastRound ? `${state.guesses.length}/${getGuessLimit()}` : `X/${getGuessLimit()}`;
       const rows = state.guesses.map((guess) => {
         return guess.word.split("").map((char, index) => char === state.secret[index] ? "🟩" : "⬛").join("");
       }).join("\n");
@@ -3072,9 +3110,12 @@
     }
 
     function decodeCustomToken(token) {
-      if (!token || token.length < MIN_CUSTOM_WORD_LENGTH * 2) return { word: "", ghostLetters: [] };
-      const [coreToken, suffix = ""] = token.split("~");
-      if (coreToken.length % 2 !== 0) return { word: "", ghostLetters: [] };
+      if (!token || token.length < MIN_CUSTOM_WORD_LENGTH * 2) return { word: "", ghostLetters: [], guessLimit: MAX_GUESSES };
+      const [tokenCore, guessPart = ""] = token.split("!");
+      const guessMatch = guessPart.match(/^g(\d{1,2})$/i);
+      const guessLimit = guessMatch ? clampCustomGuessLimit(guessMatch[1]) : MAX_GUESSES;
+      const [coreToken, suffix = ""] = tokenCore.split("~");
+      if (coreToken.length % 2 !== 0) return { word: "", ghostLetters: [], guessLimit };
       const chunks = coreToken.match(/.{2}/g) || [];
       const letters = chunks.map((chunk, index) => {
         const value = parseInt(chunk, 36);
@@ -3090,17 +3131,17 @@
       });
       const word = letters.join("");
       if (!new RegExp(`^[A-Z${CUSTOM_GHOST_CHAR.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}]{${MIN_CUSTOM_WORD_LENGTH},${MAX_CUSTOM_WORD_LENGTH}}$`).test(word)) {
-        return { word: "", ghostLetters: [] };
+        return { word: "", ghostLetters: [], guessLimit };
       }
       const ghostCount = getGhostIndexes(word).length;
       const ghostLetters = suffix
         ? suffix.slice(0, ghostCount).toUpperCase().split("").filter((char) => /^[A-Z]$/.test(char))
         : [];
-      return { word, ghostLetters };
+      return { word, ghostLetters, guessLimit };
     }
 
-    function customHashForWord(word) {
-      return `#p2=${encodeURIComponent(encodeCustomWord(word))}`;
+    function customHashForWord(word, guessLimit = state.customGuessLimit) {
+      return `#p2=${encodeURIComponent(`${encodeCustomWord(word)}!g${clampCustomGuessLimit(guessLimit)}`)}`;
     }
 
     function getBaseShareUrl() {
@@ -3113,6 +3154,7 @@
         const decoded = decodeCustomToken(decodeURIComponent(newMatch[1] || ""));
         if (decoded.word.length >= MIN_CUSTOM_WORD_LENGTH && decoded.word.length <= MAX_CUSTOM_WORD_LENGTH) {
           state.customGhostLetters = decoded.ghostLetters || [];
+          state.customGuessLimit = clampCustomGuessLimit(decoded.guessLimit || MAX_GUESSES);
           return decoded.word;
         }
       }
@@ -3134,12 +3176,12 @@
 
     function buildShareTextSafe() {
       const modeLabel = state.mode === "daily" ? `Daily ${getCurrentDailyKey()}` : state.mode === "custom" ? `Custom ${state.wordLength}` : "Unlimited";
-      const resultLabel = state.wonLastRound ? `${state.guesses.length}/${MAX_GUESSES}` : "X/6";
+      const resultLabel = state.wonLastRound ? `${state.guesses.length}/${getGuessLimit()}` : `X/${getGuessLimit()}`;
       const rows = state.guesses.map((guess) => {
         return guess.word.split("").map((char, index) => char === state.secret[index] ? "\u{1F7E9}" : "\u2B1C").join("");
       }).join("\n");
       const legend = "Green square = exact point match";
-      const tail = state.mode === "custom" ? `\n${getBaseShareUrl()}${customHashForWord(state.secret)}` : "";
+      const tail = state.mode === "custom" ? `\n${getBaseShareUrl()}${customHashForWord(state.secret, state.customGuessLimit)}` : "";
       return `Curvele ${modeLabel} ${resultLabel}\n${legend}\n${rows}${tail}`;
     }
 
@@ -3205,7 +3247,7 @@
       const label = praise[Math.max(0, Math.min(praise.length - 1, state.guesses.length - 1))];
       const toast = document.createElement("div");
       toast.className = "toast victory-toast";
-      toast.innerHTML = `<strong>${label}</strong><span>Solved in ${state.guesses.length}/${MAX_GUESSES}</span>`;
+      toast.innerHTML = `<strong>${label}</strong><span>Solved in ${state.guesses.length}/${getGuessLimit()}</span>`;
       toastLayer.appendChild(toast);
       setTimeout(() => {
         toast.remove();
@@ -3388,7 +3430,7 @@
       resultTitle.textContent = mode === "reset"
         ? "Round Reset"
         : win
-          ? `Solved in ${state.guesses.length}/${MAX_GUESSES}`
+          ? `Solved in ${state.guesses.length}/${getGuessLimit()}`
           : visibleSecretWord();
       resultText.textContent = mode === "reset"
         ? `You started a ${state.pendingResetTargetMode === "unlimited" ? "new unlimited round" : "new round"} before finishing this one.`
@@ -3396,7 +3438,7 @@
           ? `${modeName} puzzle complete.`
           : "The answer is shown below.";
       resultWord.textContent = win ? visibleSecretWord() : `The word was ${visibleSecretWord()}.`;
-      resultTries.textContent = `${state.guesses.length} of ${MAX_GUESSES}`;
+      resultTries.textContent = `${state.guesses.length} of ${getGuessLimit()}`;
       resultMode.textContent = mode === "reset"
         ? `${state.mode === "daily" ? "Daily" : state.mode === "custom" ? "Custom" : "Unlimited"} Reset`
         : `${state.mode === "daily" ? "Daily" : state.mode === "custom" ? "Custom" : "Unlimited"} ${win ? "Win" : "Loss"}`;
@@ -3487,6 +3529,9 @@
       state.currentDailyKey = getCurrentDailyKey();
       state.dailyCompletedKey = isTodayDailyCompleted() ? state.currentDailyKey : "";
       state.customWord = options.customWord || (mode === "custom" ? state.customWord : "");
+      state.customGuessLimit = mode === "custom"
+        ? clampCustomGuessLimit(options.customGuessLimit || state.customGuessLimit || MAX_GUESSES)
+        : MAX_GUESSES;
       state.linkedCustomWord = options.linkedCustomWord || state.linkedCustomWord;
       state.linkedCustomLocked = Boolean(options.linkedCustomLocked);
       if (mode !== "custom") {
@@ -3499,7 +3544,7 @@
       stopGhostAnimation();
       initializeGhostDisplayValues(state.secret);
       if (mode === "custom") {
-        window.location.hash = customHashForWord(state.secret);
+        window.location.hash = customHashForWord(state.secret, state.customGuessLimit);
       } else if (window.location.hash.startsWith("#p=") || window.location.hash.startsWith("#p2=")) {
         history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
         state.linkedCustomWord = "";
@@ -3590,7 +3635,8 @@
         return;
       }
 
-      if (state.mode !== "custom" && !state.allowedWords.has(guess)) {
+      const canUseLimitedFallback = state.mode !== "custom" && state.wordLength === 5 && state.wordListLimited && /^[A-Z]{5}$/.test(guess);
+      if (state.mode !== "custom" && !state.allowedWords.has(guess) && !canUseLimitedFallback) {
         showToast("Not in word list");
         return;
       }
@@ -3623,12 +3669,12 @@
         state.isOver = true;
         setStatus(`Correct. You found ${visibleSecretWord()}.`);
         setHint("That round is complete.");
-      } else if (state.guesses.length === MAX_GUESSES) {
+      } else if (state.guesses.length === getGuessLimit()) {
         state.isOver = true;
         setStatus("Incorrect. You are out of guesses.");
         setHint("That round is complete.");
       } else {
-        setStatus(`Incorrect. ${MAX_GUESSES - state.guesses.length} tries left.`);
+        setStatus(`Incorrect. ${getGuessLimit() - state.guesses.length} tries left.`);
         setHint("Use the guess cards to spotlight older lines if you want to compare them again.");
       }
 
@@ -3746,6 +3792,7 @@
     modeCustomButton.addEventListener("click", () => {
       modesOverlay.hidden = true;
       customOverlay.hidden = false;
+      customGuessCountInput.value = String(clampCustomGuessLimit(state.customGuessLimit));
       updateCustomWordNote(getCustomWordInputValue());
       customWordInput.focus();
     });
@@ -3862,6 +3909,12 @@
       setCustomWordInputValue(value);
       updateCustomWordNote(value);
     });
+    customGuessCountInput.addEventListener("input", (event) => {
+      const nextLimit = clampCustomGuessLimit(event.target.value);
+      state.customGuessLimit = nextLimit;
+      event.target.value = String(nextLimit);
+      manualCopyWrap.hidden = true;
+    });
     customWordInput.addEventListener("keydown", (event) => {
       if (event.key === "\\") {
         if (event.repeat) {
@@ -3892,7 +3945,9 @@
         showToast("Type at least 3 letters");
         return;
       }
-      manualCopyLink.value = `${getBaseShareUrl()}${customHashForWord(word)}`;
+      const guessLimit = clampCustomGuessLimit(customGuessCountInput.value);
+      state.customGuessLimit = guessLimit;
+      manualCopyLink.value = `${getBaseShareUrl()}${customHashForWord(word, guessLimit)}`;
       manualCopyWrap.hidden = false;
       manualCopyLink.focus();
       manualCopyLink.select();
@@ -3904,10 +3959,12 @@
         showToast("Type at least 3 letters");
         return;
       }
+      const guessLimit = clampCustomGuessLimit(customGuessCountInput.value);
+      state.customGuessLimit = guessLimit;
       customOverlay.hidden = true;
       startOverlay.hidden = true;
       initializeGhostDisplayValues(word);
-      resetGame("custom", { secret: word, customWord: word, linkedCustomLocked: false });
+      resetGame("custom", { secret: word, customWord: word, customGuessLimit: guessLimit, linkedCustomLocked: false });
       input.focus();
     });
     copyCustomLinkButton.addEventListener("click", async () => {
@@ -3916,7 +3973,9 @@
         showToast("Type at least 3 letters");
         return;
       }
-      const shareUrl = `${getBaseShareUrl()}${customHashForWord(word)}`;
+      const guessLimit = clampCustomGuessLimit(customGuessCountInput.value);
+      state.customGuessLimit = guessLimit;
+      const shareUrl = `${getBaseShareUrl()}${customHashForWord(word, guessLimit)}`;
       try {
         await navigator.clipboard.writeText(shareUrl);
         manualCopyWrap.hidden = true;
@@ -3935,7 +3994,9 @@
         showToast("Type at least 3 letters");
         return;
       }
-      manualCopyLink.value = `${getBaseShareUrl()}${customHashForWord(word)}`;
+      const guessLimit = clampCustomGuessLimit(customGuessCountInput.value);
+      state.customGuessLimit = guessLimit;
+      manualCopyLink.value = `${getBaseShareUrl()}${customHashForWord(word, guessLimit)}`;
       manualCopyWrap.hidden = false;
       manualCopyLink.focus();
       manualCopyLink.select();
@@ -3971,12 +4032,13 @@
       input.readOnly = true;
     }
     updateCustomWordNote(getCustomWordInputValue());
+    customGuessCountInput.value = String(clampCustomGuessLimit(state.customGuessLimit));
     state.linkedCustomWord = readCustomWordFromUrl();
     state.dailyCompletedKey = hasCompletedDaily() ? getCurrentDailyKey() : "";
     applySettings();
     if (state.linkedCustomWord) {
       startOverlay.hidden = true;
-      resetGame("custom", { secret: state.linkedCustomWord, linkedCustomWord: state.linkedCustomWord, linkedCustomLocked: true });
+      resetGame("custom", { secret: state.linkedCustomWord, linkedCustomWord: state.linkedCustomWord, customGuessLimit: state.customGuessLimit, linkedCustomLocked: true });
     } else {
       resetGame(state.dailyCompletedKey ? "unlimited" : "daily");
     }
